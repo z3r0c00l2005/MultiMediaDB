@@ -1,8 +1,0 @@
-from django.contrib import admin
-from multimediadb.models import Aircrafttype
-
-class TypesAdmin(admin.ModelAdmin):
-    list_display = ('name', 'description')
-
-
-admin.site.register(Aircrafttype, TypesAdmin)
