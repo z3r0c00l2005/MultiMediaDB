@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+{% block title %}Aircraft Types{% endblock %}
+{% block header %}Aircraft Types{% endblock %}
+{% block content %}
+<div class="actions">
+	<ul>
+		<li><a href='#'>New Aircraft Type</a></li>
+		<li><a href="/admin">ADMIN</a></li>
+		<li><a href='#'>Logout</a></li>
+	</ul>
+</div>
+<div class="aircrafttypes index">
+	<h2>Aircraft Types</h2>
+	<table cellpadding="0" cellspacing="0">
+	
+{% for aircrafttype in types %}
+    {% if forloop.first %}    
+    <tr>
+			<th>Name</th>
+			<th>Description</th>
+			<th class="actions">Actions</th>
+	</tr>
+    {% endif %}
+	<tr>
+		<td>{{ aircrafttype.name }}&nbsp;</td>
+		<td>{{ aircrafttype.description }}&nbsp;</td>
+		<td class="actions">
+			<a href="{% url 'typeview' aircrafttype.id %}">View</a>
+			<a href='#'>Edit</a>
+		</td>
+	</tr>
+{% empty %}
+    <tr>
+        <td>No Types Defined!</td>
+    </tr>
+{% endfor %}
+	</table>
+	{% comment %}
+	<p>
+	Page {:page} of {:pages}, showing {:current} records out of {:count} total, starting on record {:start}, ending on {:end}'</p>
+	<div class="paging">
+		<a href='#'>previous</a>
+		<a href='#'>next</a>
+	</div>
+	{% endcomment %}
+</div>
+
+
+{% endblock %}
+
+{% block footer %}A footer{% endblock %}
