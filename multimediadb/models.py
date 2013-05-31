@@ -16,7 +16,7 @@ class Aircraftsystem(models.Model):
     name = models.CharField(max_length=30)
     description = models.CharField(max_length=50)
     workshare = models.CharField(max_length=2, choices=WORKSHARE_CHOICES)
-    status = models.CharField(max_length=25)
+    status = models.CharField(max_length=25, default='Not Started')
     
     def __unicode__(self):
         return u'%s - %s' % (self.name, self.description)
