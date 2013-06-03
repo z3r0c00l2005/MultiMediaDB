@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% block title %}Aircraft System Add{% endblock %}
+{% block header %}Aircraft System Add{% endblock %}
+{% block content %}
+<div class="actions">
+	<ul>
+		<li><a href="{% url 'typeindex' %}">All Aircraft Types</a></li>
+		<li><a href='#'>Logout</a></li>
+	</ul>
+</div>
+
+<div class="aircraftsystems form">
+	<h2>New Aircraft System</h2>
+	
+	{% if form.errors %}
+        <p style="color: red;">
+            Please correct the error{{ form.errors|pluralize }} below.
+        </p>
+    {% endif %}
+
+   <form action="" method="post">
+        <div class="field">
+            {{ form.name.errors }}
+            <label for="name">Name:</label>
+            {{ form.name }}
+        </div>
+        <div class="field">
+            {{ form.description.errors }}
+            <label for="description">Description:</label>
+            {{ form.description }}
+        </div>
+		<div class="field">
+            {{ form.workshare.errors }}
+            <label for="workshare">Workshare:</label>
+            {{ form.workshare }}
+        </div>
+        <div class="submit">
+        <input type="submit" name="submit" value="Submit">
+        <input type="submit" name="cancel" value="Cancel">
+    </div>
+    </form>
+</div>
+
+{% endblock %}
