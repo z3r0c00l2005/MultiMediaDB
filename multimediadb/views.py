@@ -2,6 +2,7 @@ from django.http import HttpResponse, Http404, HttpResponseRedirect
 from django.core.urlresolvers import reverse
 from django.shortcuts import render
 from django.forms.models import model_to_dict
+from django.db.models import Sum
 import datetime
 from multimediadb.models import Aircrafttype, Aircraftsystem, Systemgraphic, Graphicworkdone
 from multimediadb.forms import TypeAddForm, SystemAddForm, SystemEditForm, GraphicAddForm, GraphicEditForm, WorkAddForm, WorkEditForm
@@ -71,7 +72,10 @@ def systemview(request, type_id, system_id):
     type = Aircrafttype.objects.get(pk=type_id)
     system = Aircraftsystem.objects.get(pk=system_id)
     graphics = Systemgraphic.objects.filter(aircraftsystem_id=system_id)
-    return render(request, 'aircraftsystems/view.html', {'aircrafttype': type, 'system': system, 'graphics': graphics,})
+    hourssum = Systemgraphic.objects.filter(aircraftsystem_id=system_id).aggregate(totalestimate=Sum('adjusted_hours'))
+    #Aircraftsystem.objects.('name').annotate(totalestimate=sum('Systemgraphics__adjusted_hours'))
+
+    return render(request, 'aircraftsystems/view.html', {'aircrafttype': type, 'system': system, 'graphics': graphics,'counts': hourssum})
     
 # ################
 # Graphic Views  #
