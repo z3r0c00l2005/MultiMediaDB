@@ -42,7 +42,7 @@
 		<td>{{ system.status }}&nbsp;</td>
 		<td class="actions">
 			<a href='{% url 'systemview' aircrafttype.id system.id %}'>View</a>
-			<a href='#'>Edit</a>
+			<a href='{% url 'systemedit' aircrafttype.id system.id %}'>Edit</a>
 		</td>
 	</tr>
 {% empty %}

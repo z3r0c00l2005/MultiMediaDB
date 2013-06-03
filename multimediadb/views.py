@@ -1,9 +1,10 @@
 from django.http import HttpResponse, Http404, HttpResponseRedirect
 from django.core.urlresolvers import reverse
 from django.shortcuts import render
+from django.forms.models import model_to_dict
 import datetime
 from multimediadb.models import Aircrafttype, Aircraftsystem, Systemgraphic
-from multimediadb.forms import TypeAddForm, SystemAddForm, GraphicAddForm
+from multimediadb.forms import TypeAddForm, SystemAddForm, SystemEditForm, GraphicAddForm, GraphicEditForm
 # ################
 # Type Views     #
 # ################
@@ -48,6 +49,23 @@ def systemadd(request, type_id):
     else:
         form = SystemAddForm()
     return render(request, 'aircraftsystems/add.html', {'form': form})
+
+def systemedit(request, type_id, system_id):
+    if 'cancel' in request.POST:
+            return HttpResponseRedirect(reverse('typeview', args=(type_id,)))   
+    if request.method == 'POST':
+        form = SystemEditForm(request.POST)
+        if form.is_valid():
+            cd = form.cleaned_data
+            type = Aircrafttype.objects.get(id=type_id)
+            Aircraftsystem.objects.filter(id=system_id).update(aircrafttype=type, name=cd['name'], description=cd['description'], workshare=cd['workshare'],)
+            return HttpResponseRedirect(reverse('typeview', args=(type_id,)))
+    else:
+        system = Aircraftsystem.objects.get(id=system_id)
+        dictionary = model_to_dict(system, fields=[], exclude=[])
+        form = SystemEditForm(initial=dictionary)
+    return render(request, 'aircraftsystems/edit.html', {'form': form})
+
 	
 def systemview(request, type_id, system_id):
     type = Aircrafttype.objects.get(pk=type_id)
@@ -74,3 +92,20 @@ def graphicadd(request, type_id, system_id):
     else:
         form = GraphicAddForm()
     return render(request, 'systemgraphics/add.html', {'form': form})
+    
+def graphicedit(request, type_id, system_id, graphic_id):
+    if 'cancel' in request.POST:
+            return HttpResponseRedirect(reverse('systemview', args=(type_id, system_id)))    
+    if request.method == 'POST':
+        form = GraphicEditForm(request.POST)
+        if form.is_valid():
+            cd = form.cleaned_data
+            type = Aircrafttype.objects.get(id=type_id)
+            system = Aircraftsystem.objects.get(id=system_id)
+            Systemgraphic.objects.filter(id=graphic_id).update(aircraftsystem=system, media_label=cd['media_label'], title=cd['title'], description=cd['description'], adjusted_hours=cd['adjusted_hours'],)
+            return HttpResponseRedirect(reverse('systemview', args=(type_id, system_id)))
+    else:
+        graphic = Systemgraphic.objects.get(id=graphic_id)
+        dictionary = model_to_dict(graphic, fields=[], exclude=[])
+        form = GraphicEditForm(initial=dictionary)
+    return render(request, 'systemgraphics/edit.html', {'form': form})

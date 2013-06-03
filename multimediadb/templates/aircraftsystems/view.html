@@ -49,7 +49,7 @@
         <td>{{ graphic.on_hOld }}&nbsp;</td>
 		<td class="actions">
 			<a href='#'>View</a>
-			<a href='#'>Edit</a>
+			<a href='{% url 'graphicedit' aircrafttype.id system.id graphic.id %}'>Edit</a>
 		</td>
 	</tr>
 {% empty %}

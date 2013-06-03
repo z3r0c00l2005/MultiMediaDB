@@ -22,6 +22,8 @@ urlpatterns = patterns('',
 	
 	url(r'^systems/add/(?P<type_id>\d+)/', views.systemadd, name='systemadd'),
 	url(r'^systems/(?P<type_id>\d+)/(?P<system_id>\d+)/', views.systemview, name='systemview'),
+    url(r'^systems/edit/(?P<type_id>\d+)/(?P<system_id>\d+)/', views.systemedit, name='systemedit'),
     
     url(r'^graphics/add/(?P<type_id>\d+)/(?P<system_id>\d+)/', views.graphicadd, name='graphicadd'),
+    url(r'^graphics/edit/(?P<type_id>\d+)/(?P<system_id>\d+)/(?P<graphic_id>\d+)/', views.graphicedit, name='graphicedit'),
 )
