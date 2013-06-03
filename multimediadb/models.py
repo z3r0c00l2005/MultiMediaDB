@@ -45,3 +45,13 @@ class Systemgraphic(models.Model):
     def __unicode__(self):
         return u'%s - %s' % (self.title, self.description)
         
+class Graphicworkdone(models.Model):
+    systemgraphic = models.ForeignKey(Systemgraphic)
+    work_carried_out = models.CharField(max_length=255)
+    created_by = models.CharField(max_length=50)
+    modified_by = models.CharField(max_length=50)
+    created = models.DateTimeField(auto_now_add=True, auto_now=False)
+    modified = models.DateTimeField(auto_now=True, auto_now_add=False)
+        
+    def __unicode__(self):
+        return u'%s - %s' % (self.systemgraphic, self.work_carried_out)
