@@ -41,7 +41,7 @@
 		<td>{{ system.workshare }}&nbsp;</td>
 		<td>{{ system.status }}&nbsp;</td>
 		<td class="actions">
-			<a href='#'>View</a>
+			<a href='{% url 'systemview' aircrafttype.id system.id %}'>View</a>
 			<a href='#'>Edit</a>
 		</td>
 	</tr>

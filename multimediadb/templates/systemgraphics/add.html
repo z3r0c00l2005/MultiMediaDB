@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+
+{% block title %}Graphic Add{% endblock %}
+{% block header %}Graphic Add{% endblock %}
+{% block content %}
+<div class="actions">
+	<ul>
+		<li><a href="#">All Graphics</a></li>
+		<li><a href='#'>Logout</a></li>
+	</ul>
+</div>
+
+<div class="aircraftgraphics form">
+	<h2>New Graphic</h2>
+	
+	{% if form.errors %}
+        <p style="color: red;">
+            Please correct the error{{ form.errors|pluralize }} below.
+        </p>
+    {% endif %}
+
+   <form action="" method="post">
+        <div class="field">
+            {{ form.media_label.errors }}
+            <label for="media_label">Media Label:</label>
+            {{ form.media_label }}
+        </div>
+        <div class="field">
+            {{ form.title.errors }}
+            <label for="title">Title:</label>
+            {{ form.title }}
+        </div>
+        <div class="field">
+            {{ form.description.errors }}
+            <label for="description">Description:</label>
+            {{ form.description }}
+        </div>
+		<div class="field">
+            {{ form.estimated_hours.errors }}
+            <label for="estimated_hours">Estimated Hours:</label>
+            {{ form.estimated_hours }}
+        </div>
+        <div class="submit">
+        <input type="submit" name="submit" value="Submit">
+        <input type="submit" name="cancel" value="Cancel">
+    </div>
+    </form>
+</div>
+
+{% endblock %}
