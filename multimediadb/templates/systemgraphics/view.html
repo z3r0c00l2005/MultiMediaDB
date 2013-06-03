@@ -1,55 +1,56 @@
 {% extends "base.html" %}
 
-{% block title %}Aircraft System View{% endblock %}
-{% block header %}Aircraft System View{% endblock %}
+{% block title %}Graphic View{% endblock %}
+{% block header %}Graphic View{% endblock %}
 {% block content %}
 <div class="actions">
 	<ul>
-		<li><a href="{% url 'typeview' aircrafttype.id %}">All Aircraft Systems</a></li>
-        <li><a href="{% url 'graphicadd' aircrafttype.id system.id %}">New Graphic</a></li>
+		<li><a href="{% url 'systemview' aircrafttype.id system.id %}">All System Graphics</a></li>
+    <li><a href="{% url 'workadd' aircrafttype.id system.id graphic.id %}">Add Work Done</a></li>
 		<li><a href='#'>Logout</a></li>
 	</ul>
 </div>
 
-<div class="aircraftsystems view">
-	<h2>System</h2>
+<div class="graphics view">
+	<h2>Graphic</h2>
        <dl>
-           <dt>Name</dt>
-           <dd>{{ system.name }}&nbsp;</dd>
+           <dt>Media Label</dt>
+           <dd>{{ graphic.media_label }}&nbsp;</dd>
+           <dt>Title</dt>
+           <dd>{{ graphic.title }}&nbsp;</dd>
            <dt>Description</dt>
-           <dd>{{ system.description }}&nbsp;</dd>
+           <dd>{{ graphic.description }}&nbsp;</dd>
+           <dt>Version</dt>
+           <dd>{{ graphic.version|stringformat:'02d' }}&nbsp;</dd>
+           <dt>Estimated Hours</dt>
+           <dd>{{ graphic.adjusted_hours }}&nbsp;</dd>
+           <dt>Status</dt>
+           <dd>{{ graphic.status }}&nbsp;</dd>
        </dl>
 </div>
 
 <div class="related">
-	{% for graphic in graphics %}
+	{% for work in works %}
     {% if forloop.first %}    
-    <h3>Graphics</h3>
+    <h3>Work Done</h3>
 	<table cellpadding = "0" cellspacing = "0">
     <tr>
-			<th>Media Label</th>
-			<th>Title</th>
-    		<th>Description</th>
-            <th>Version</th>
-            <th>Estimated Hours</th>
-            <th>Adjusted Hours</th>
-    		<th>Status</th>
-            <th>On Hold</th>
-			<th class="actions">Actions</th>
+			<th>Work Carried Out</th>
+			<th>User</th>
+  		<th>Hours Expended</th>
+      <th>Date Modified</th>
+      <th>Modified By</th>
+      <th class="actions">Actions</th>
 	</tr>
     {% endif %}
 	<tr>
-		<td>{{ graphic.media_label }}&nbsp;</td>
-		<td>{{ graphic.title }}&nbsp;</td>
-		<td>{{ graphic.description }}&nbsp;</td>
-        <td>{{ graphic.version }}&nbsp;</td>
-        <td>{{ graphic.estimated_hours }}&nbsp;</td>
-        <td>{{ graphic.adjusted_hours }}&nbsp;</td>
-		<td>{{ graphic.status }}&nbsp;</td>
-        <td>{{ graphic.on_hOld }}&nbsp;</td>
-		<td class="actions">
-			<a href='#'>View</a>
-			<a href='#'>Edit</a>
+		<td>{{ work.work_carried_out }}&nbsp;</td>
+		<td>{{ work.created_by }}&nbsp;</td>
+		<td>{{ work.hours_expended }}&nbsp;</td>
+    <td>{{ work.modified }}&nbsp;</td>
+    <td>{{ work.modified_by }}&nbsp;</td>
+    <td class="actions">
+  	<a href='{% url 'workedit' aircrafttype.id system.id graphic.id work.id %}'>Edit</a>
 		</td>
 	</tr>
 {% empty %}

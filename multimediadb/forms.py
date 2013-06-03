@@ -33,3 +33,14 @@ class GraphicEditForm(forms.Form):
     title = forms.CharField(max_length=50)
     description = forms.CharField(max_length=50)
     adjusted_hours = forms.DecimalField(max_digits=5, decimal_places=2)
+
+class WorkAddForm(forms.Form):
+    work_carried_out = forms.CharField(max_length=50)
+    user = forms.CharField(max_length=50)
+    hours_expended = forms.DecimalField(max_digits=5, decimal_places=2)
+    
+class WorkEditForm(forms.Form):
+    work_carried_out = forms.CharField(max_length=50)
+    user = forms.CharField(max_length=50)
+    hours_expended = forms.DecimalField(max_digits=5, decimal_places=2)
+    

@@ -3,8 +3,8 @@ from django.core.urlresolvers import reverse
 from django.shortcuts import render
 from django.forms.models import model_to_dict
 import datetime
-from multimediadb.models import Aircrafttype, Aircraftsystem, Systemgraphic
-from multimediadb.forms import TypeAddForm, SystemAddForm, SystemEditForm, GraphicAddForm, GraphicEditForm
+from multimediadb.models import Aircrafttype, Aircraftsystem, Systemgraphic, Graphicworkdone
+from multimediadb.forms import TypeAddForm, SystemAddForm, SystemEditForm, GraphicAddForm, GraphicEditForm, WorkAddForm, WorkEditForm
 # ################
 # Type Views     #
 # ################
@@ -109,3 +109,50 @@ def graphicedit(request, type_id, system_id, graphic_id):
         dictionary = model_to_dict(graphic, fields=[], exclude=[])
         form = GraphicEditForm(initial=dictionary)
     return render(request, 'systemgraphics/edit.html', {'form': form})
+
+def graphicview(request, type_id, system_id, graphic_id):
+    type = Aircrafttype.objects.get(pk=type_id)
+    system = Aircraftsystem.objects.get(pk=system_id)
+    graphic = Systemgraphic.objects.get(pk=graphic_id)
+    works = Graphicworkdone.objects.filter(systemgraphic_id=graphic_id)
+    return render(request, 'systemgraphics/view.html', {'aircrafttype': type, 'system': system, 'graphic': graphic, 'works': works,})
+
+# ################
+# Work Views     #
+# ################
+    
+def workadd(request, type_id, system_id, graphic_id):
+    if 'cancel' in request.POST:
+            return HttpResponseRedirect(reverse('graphicview', args=(type_id, system_id, graphic_id)))    
+    if request.method == 'POST':
+        form = WorkAddForm(request.POST)
+        if form.is_valid():
+            cd = form.cleaned_data
+            type = Aircrafttype.objects.get(id=type_id)
+            system = Aircraftsystem.objects.get(id=system_id)
+            graphic = Systemgraphic.objects.get(id=graphic_id)
+            query = Graphicworkdone(systemgraphic=graphic, work_carried_out=cd['work_carried_out'], created_by=cd['user'], hours_expended=cd['hours_expended'],)
+            query.save()
+            Systemgraphic.objects.filter(id=graphic_id).update(status='In Progress',)
+            return HttpResponseRedirect(reverse('graphicview', args=(type_id, system_id, graphic_id)))    
+    else:
+        form = WorkAddForm()
+    return render(request, 'graphicwork/add.html', {'form': form})
+    
+def workedit(request, type_id, system_id, graphic_id, work_id):
+    if 'cancel' in request.POST:
+            return HttpResponseRedirect(reverse('graphicview', args=(type_id, system_id, graphic_id)))    
+    if request.method == 'POST':
+        form = WorkEditForm(request.POST)
+        if form.is_valid():
+            cd = form.cleaned_data
+            type = Aircrafttype.objects.get(id=type_id)
+            system = Aircraftsystem.objects.get(id=system_id)
+            graphic = Systemgraphic.objects.get(id=graphic_id)
+            Graphicworkdone.objects.filter(id=work_id).update(systemgraphic=graphic, work_carried_out=cd['work_carried_out'], modified_by=cd['user'], hours_expended=cd['hours_expended'],)
+            return HttpResponseRedirect(reverse('graphicview', args=(type_id, system_id, graphic_id)))    
+    else:
+        work = Graphicworkdone.objects.get(id=work_id)
+        dictionary = model_to_dict(work, fields=[], exclude=[])
+        form = WorkEditForm(initial=dictionary)
+    return render(request, 'graphicwork/edit.html', {'form': form})

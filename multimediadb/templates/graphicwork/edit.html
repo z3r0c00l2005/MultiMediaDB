@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Work Done{% endblock %}
+{% block header %}Edit Work Done{% endblock %}
+{% block content %}
+<div class="actions">
+	<ul>
+		<li><a href="#">All Graphics</a></li>
+		<li><a href='#'>Logout</a></li>
+	</ul>
+</div>
+
+<div class="aircraftgraphics form">
+	<h2>Edit Work Done</h2>
+	
+	{% if form.errors %}
+        <p style="color: red;">
+            Please correct the error{{ form.errors|pluralize }} below.
+        </p>
+    {% endif %}
+
+   <form action="" method="post">
+        <div class="field">
+            {{ form.work_carried_out.errors }}
+            <label for="work_carried_out">Work Done:</label>
+            {{ form.work_carried_out }}
+        </div>
+        <div class="field">
+            {{ form.user.errors }}
+            <label for="user">User:</label>
+            {{ form.user }}
+        </div>
+        <div class="field">
+            {{ form.hours_expended.errors }}
+            <label for="hours_expended">Hours Expended:</label>
+            {{ form.hours_expended }}
+        </div>
+		<div class="submit">
+        <input type="submit" name="submit" value="Submit">
+        <input type="submit" name="cancel" value="Cancel">
+    </div>
+    </form>
+</div>
+
+{% endblock %}
