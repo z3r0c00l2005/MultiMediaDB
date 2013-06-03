@@ -30,14 +30,14 @@ def typeadd(request):
 	
 def systemadd(request, type_id):
     if 'cancel' in request.POST:
-            return HttpResponseRedirect(reverse('typeindex'))    
+            return HttpResponseRedirect(reverse('typeview', type_id))    
     if request.method == 'POST':
         form = SystemAddForm(request.POST)
         if form.is_valid():
             cd = form.cleaned_data
             #query = Aircrafttype(name=cd['name'], description=cd['description'])
             #query.save()
-            return HttpResponseRedirect(reverse('typeindex'))
+            return HttpResponseRedirect(reverse('typeview', type_id))
     else:
         form = SystemAddForm()
     return render(request, 'aircraftsystems/add.html', {'form': form})
