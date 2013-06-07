@@ -117,6 +117,8 @@ TEMPLATE_DIRS = (
     os.path.join(os.path.dirname(__file__), 'templates').replace('\\','/'),
 )
 
+MESSAGE_STORAGE = 'django.contrib.messages.storage.session.SessionStorage'
+
 INSTALLED_APPS = (
     'django.contrib.auth',
     'django.contrib.contenttypes',

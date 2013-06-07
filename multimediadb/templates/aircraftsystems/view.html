@@ -18,18 +18,21 @@
            <dd>{{ system.name }}&nbsp;</dd>
            <dt>Description</dt>
            <dd>{{ system.description }}&nbsp;</dd>
-           <dt>Num. of Graphics</dt>
-           <dd>{{ graphics.count }}&nbsp;</dd>
+           <dt>Status</dt>
+           <dd><b>In work: </b>{{ graphics.count }}<b> On Hold: </b>{{ holdgraphics.count }}<b> In QA: </b>{{ inqa.count }}<b> Completed: </b>{{ completed.count }}<b> Total: </b>{{ allgraphics.count }}&nbsp;</dd>
            <dt>Hours</dt>
-           <dd>{{ counts.totalestimate }}&nbsp;</dd>
+           <dd><b>Estimated: </b>{{ est.estimate }}<b> Adjusted: </b>{{ adjest.adjustedestimate }}<b> Completed: </b>{{ counts.totalestimate }}&nbsp;</dd>
        </dl>
 </div>
 
 <div class="related">
-	{% for graphic in graphics %}
-    {% if forloop.first %}    
     <h3>Graphics</h3>
-	<table cellpadding = "0" cellspacing = "0">
+{% for graphic in graphics %}
+    {% if forloop.first %}    
+ 	<table cellpadding = "0" cellspacing = "0">
+    <tr>
+        <td><h4>In Development</h4></td>
+    </tr>
     <tr>
 			<th>Media Label</th>
 			<th>Title</th>
@@ -49,19 +52,84 @@
         <td>{{ graphic.version|stringformat:'02d' }}&nbsp;</td>
         <td>{{ graphic.estimated_hours }}&nbsp;</td>
         <td>{{ graphic.adjusted_hours }}&nbsp;</td>
-		<td>{{ graphic.status }}&nbsp;</td>
-        <td>{{ graphic.on_hOld }}&nbsp;</td>
+		<td>{% if graphic.status = 'Not Started' %}<img src='/static/not_started.png'>{% else %}<img src='/static/in_progress.png'>{% endif %}&nbsp;</td>
+        <td>{% if graphic.on_hold %}<img src='/static/on_hold.png'>{% endif %}&nbsp;</td>
 		<td class="actions">
 			<a href='{% url 'graphicview' aircrafttype.id system.id graphic.id %}'>View</a>
 			<a href='{% url 'graphicedit' aircrafttype.id system.id graphic.id %}'>Edit</a>
 		</td>
 	</tr>
-{% empty %}
-    <tr>
-        <td>No Graphics Defined!</td>
-    </tr>
-{% endfor %}
 	
+{% empty %}
+{% endfor %}
+</table>
+{% for qa in inqa %}
+    {% if forloop.first %}    
+ 	<table cellpadding = "0" cellspacing = "0">
+	<tr>
+        <td><h4>In QA Process</h4></td>
+    </tr>
+    <tr>
+			<th>Media Label</th>
+			<th>Title</th>
+    		<th>Description</th>
+            <th>Version</th>
+            <th>Estimated Hours</th>
+            <th>Adjusted Hours</th>
+    		<th>Status</th>
+			<th class="actions">Actions</th>
+	</tr>
+    {% endif %}
+	<tr>
+		<td>{{ qa.media_label }}&nbsp;</td>
+		<td>{{ qa.title }}&nbsp;</td>
+		<td>{{ qa.description }}&nbsp;</td>
+        <td>{{ qa.version|stringformat:'02d' }}&nbsp;</td>
+        <td>{{ qa.estimated_hours }}&nbsp;</td>
+        <td>{{ qa.adjusted_hours }}&nbsp;</td>
+		<td>{% if qa.status = 'Development Completed' %}<img src='/static/not_started.png'>{% else %}<img src='/static/in_progress.png'>{% endif %}&nbsp;</td>
+		<td class="actions">
+			<a href='{% url 'graphicview' aircrafttype.id system.id qa.id %}'>View</a>
+		</td>
+	</tr>
+
+{% empty %}
+{% endfor %}
+	</table>
+{% for complete in completed %}
+    {% if forloop.first %}    
+	<table cellpadding = "0" cellspacing = "0">
+	<tr>
+        <td><h4>Completed</h4></td>
+    </tr>
+    <tr>
+			<th>Media Label</th>
+			<th>Title</th>
+    		<th>Description</th>
+            <th>Version</th>
+            <th>Estimated Hours</th>
+            <th>Adjusted Hours</th>
+    		<th>Status</th>
+			<th class="actions">Actions</th>
+	</tr>
+    {% endif %}
+	<tr>
+		<td>{{ complete.media_label }}&nbsp;</td>
+		<td>{{ complete.title }}&nbsp;</td>
+		<td>{{ complete.description }}&nbsp;</td>
+        <td>{{ complete.version|stringformat:'02d' }}&nbsp;</td>
+        <td>{{ complete.estimated_hours }}&nbsp;</td>
+        <td>{{ complete.adjusted_hours }}&nbsp;</td>
+        <td>{% if complete.status = 'External Review Pass' %}<img src='/static/completed.png'>{% endif %}&nbsp;</td>
+		<td class="actions">
+			<a href='{% url 'graphicview' aircrafttype.id system.id complete.id %}'>View</a>
+		</td>
+	</tr>
+
+{% empty %}
+{% endfor %}
+	</table>
+
 </div>
 
 {% endblock %}

@@ -1,8 +1,9 @@
 from django.http import HttpResponse, Http404, HttpResponseRedirect
 from django.core.urlresolvers import reverse
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.forms.models import model_to_dict
 from django.db.models import Sum
+from django.contrib import messages
 import datetime
 from multimediadb.models import Aircrafttype, Aircraftsystem, Systemgraphic, Graphicworkdone
 from multimediadb.forms import TypeAddForm, SystemAddForm, SystemEditForm, GraphicAddForm, GraphicEditForm, WorkAddForm, WorkEditForm
@@ -71,11 +72,16 @@ def systemedit(request, type_id, system_id):
 def systemview(request, type_id, system_id):
     type = Aircrafttype.objects.get(pk=type_id)
     system = Aircraftsystem.objects.get(pk=system_id)
-    graphics = Systemgraphic.objects.filter(aircraftsystem_id=system_id)
-    hourssum = Systemgraphic.objects.filter(aircraftsystem_id=system_id).aggregate(totalestimate=Sum('adjusted_hours'))
-    #Aircraftsystem.objects.('name').annotate(totalestimate=sum('Systemgraphics__adjusted_hours'))
-
-    return render(request, 'aircraftsystems/view.html', {'aircrafttype': type, 'system': system, 'graphics': graphics,'counts': hourssum})
+    # Tables of graphics
+    allgraphics = Systemgraphic.objects.filter(aircraftsystem_id=system_id)
+    holdgraphics = Systemgraphic.objects.filter(aircraftsystem_id=system_id).filter(status__in=['Not Started','In Progress']).filter(on_hold=1)
+    graphics = Systemgraphic.objects.filter(aircraftsystem_id=system_id).filter(status__in=['Not Started','In Progress'])
+    inqa = Systemgraphic.objects.filter(aircraftsystem_id=system_id, status__in=['Development Completed','Tech Review Pass','Edit Review Pass','Internal QA Pass','Uploaded LCMS'])
+    complete = Systemgraphic.objects.filter(aircraftsystem_id=system_id).filter(status__in=['External Review Pass'])
+    # Header Calculations
+    adjest = Systemgraphic.objects.filter(aircraftsystem_id=system_id).aggregate(adjustedestimate=Sum('adjusted_hours'))
+    est = Systemgraphic.objects.filter(aircraftsystem_id=system_id).aggregate(estimate=Sum('estimated_hours'))
+    return render(request, 'aircraftsystems/view.html', {'aircrafttype': type, 'system': system, 'allgraphics': allgraphics, 'graphics': graphics, 'holdgraphics': holdgraphics, 'inqa': inqa, 'completed': complete, 'adjest': adjest, 'est': est})
     
 # ################
 # Graphic Views  #
@@ -120,6 +126,16 @@ def graphicview(request, type_id, system_id, graphic_id):
     graphic = Systemgraphic.objects.get(pk=graphic_id)
     works = Graphicworkdone.objects.filter(systemgraphic_id=graphic_id)
     return render(request, 'systemgraphics/view.html', {'aircrafttype': type, 'system': system, 'graphic': graphic, 'works': works,})
+
+def graphicdone(request, type_id, system_id, graphic_id):
+    type = Aircrafttype.objects.get(pk=type_id)
+    system = Aircraftsystem.objects.get(pk=system_id)
+    graphic = Systemgraphic.objects.get(pk=graphic_id)
+    Systemgraphic.objects.filter(id=graphic_id).update(status='Development Completed',)
+    works = Graphicworkdone.objects.filter(systemgraphic_id=graphic_id)
+#    return render(request, 'systemgraphics/view.html', {'aircrafttype': type, 'system': system, 'graphic': graphic, 'works': works,})
+    return redirect('systemview', type_id=type.id, system_id=system.id,)
+
 
 # ################
 # Work Views     #
