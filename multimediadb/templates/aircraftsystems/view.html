@@ -85,7 +85,7 @@
         <td>{{ qa.version|stringformat:'02d' }}&nbsp;</td>
 		<td>{% if qa.status = 'Development Completed' %}<img src='/static/not_started.png'>{% else %}<img src='/static/in_progress.png'>{% endif %}&nbsp;</td>
 		<td class="actions">
-			<a href='{% url 'graphicview' aircrafttype.id system.id qa.id %}'>View</a>
+			<a href='{% url 'graphicview' aircrafttype.id system.id qa.id %}'>Perform QA</a>
 		</td>
 	</tr>
 
