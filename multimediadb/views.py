@@ -134,9 +134,18 @@ def graphicdone(request, type_id, system_id, graphic_id):
     graphic = Systemgraphic.objects.get(pk=graphic_id)
     Systemgraphic.objects.filter(id=graphic_id).update(status='Development Completed',)
     works = Graphicworkdone.objects.filter(systemgraphic_id=graphic_id)
-#    return render(request, 'systemgraphics/view.html', {'aircrafttype': type, 'system': system, 'graphic': graphic, 'works': works,})
     return redirect('systemview', type_id=type.id, system_id=system.id,)
 
+def graphicholdtoggle(request, type_id, system_id, graphic_id):
+    type = Aircrafttype.objects.get(pk=type_id)
+    system = Aircraftsystem.objects.get(pk=system_id)
+    graphic = Systemgraphic.objects.get(pk=graphic_id)
+    if graphic.on_hold:
+        Systemgraphic.objects.filter(id=graphic_id).update(on_hold=0,)
+    else:
+        Systemgraphic.objects.filter(id=graphic_id).update(on_hold=1,)
+    works = Graphicworkdone.objects.filter(systemgraphic_id=graphic_id)
+    return redirect('systemview', type_id=type.id, system_id=system.id,)
 
 # ################
 # Work Views     #
