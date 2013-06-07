@@ -56,3 +56,15 @@ class Graphicworkdone(models.Model):
         
     def __unicode__(self):
         return u'%s - %s' % (self.systemgraphic, self.work_carried_out)
+
+class Comments(models.Model):
+    source = models.CharField(max_length=50)
+    source_id = models.PositiveIntegerField()
+    comment = models.TextField()
+    created_by = models.CharField(max_length=50)
+    modified_by = models.CharField(max_length=50)
+    created = models.DateTimeField(auto_now_add=True, auto_now=False)
+    modified = models.DateTimeField(auto_now=True, auto_now_add=False)
+        
+    def __unicode__(self):
+        return u'%s - %s' % (self.source, self.source_id, self.comment)    
