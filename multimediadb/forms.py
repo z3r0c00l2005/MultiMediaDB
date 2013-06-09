@@ -44,3 +44,9 @@ class WorkEditForm(forms.Form):
     user = forms.CharField(max_length=50)
     hours_expended = forms.DecimalField(max_digits=5, decimal_places=2)
     
+class CommentAddForm(forms.Form):
+    comment = forms.CharField()
+    
+class CommentEditForm(forms.Form):
+    comment = forms.CharField()
+    

@@ -5,8 +5,8 @@ from django.forms.models import model_to_dict
 from django.db.models import Sum
 from django.contrib import messages
 import datetime
-from multimediadb.models import Aircrafttype, Aircraftsystem, Systemgraphic, Graphicworkdone
-from multimediadb.forms import TypeAddForm, SystemAddForm, SystemEditForm, GraphicAddForm, GraphicEditForm, WorkAddForm, WorkEditForm
+from multimediadb.models import Aircrafttype, Aircraftsystem, Systemgraphic, Graphicworkdone, Comments
+from multimediadb.forms import TypeAddForm, SystemAddForm, SystemEditForm, GraphicAddForm, GraphicEditForm, WorkAddForm, WorkEditForm, CommentAddForm, CommentEditForm
 # ################
 # Type Views     #
 # ################
