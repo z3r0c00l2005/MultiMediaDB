@@ -61,6 +61,7 @@ class Comments(models.Model):
     source = models.CharField(max_length=50)
     source_id = models.PositiveIntegerField()
     comment = models.TextField()
+    comment_type = models.CharField(max_length=50)
     created_by = models.CharField(max_length=50)
     modified_by = models.CharField(max_length=50)
     created = models.DateTimeField(auto_now_add=True, auto_now=False)

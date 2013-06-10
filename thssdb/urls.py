@@ -34,5 +34,5 @@ urlpatterns = patterns('',
     url(r'^work/add/(?P<type_id>\d+)/(?P<system_id>\d+)/(?P<graphic_id>\d+)/', views.workadd, name='workadd'),
     url(r'^work/edit/(?P<type_id>\d+)/(?P<system_id>\d+)/(?P<graphic_id>\d+)/(?P<work_id>\d+)/', views.workedit, name='workedit'),
     
-    url(r'^comment/(?P<type_id>\d+)/(?P<system_id>\d+)/(?P<graphic_id>\d+)/(?P<source>\w+)/', views.commentadd, name='commentadd'),
+    url(r'^comment/(?P<type_id>\d+)/(?P<system_id>\d+)/(?P<graphic_id>\d+)/(?P<source>\w+)/(?P<commenttype>\w+)/', views.commentadd, name='commentadd'),
     )

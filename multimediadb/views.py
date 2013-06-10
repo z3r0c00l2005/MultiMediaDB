@@ -195,7 +195,7 @@ def workedit(request, type_id, system_id, graphic_id, work_id):
 # Comment Views  #
 # ################
     
-def commentadd(request, type_id, system_id, graphic_id=0, source='a'):
+def commentadd(request, type_id, system_id, graphic_id=0, source='a', commenttype='a'):
     if source == 'system':
         if 'cancel' in request.POST:
                 return HttpResponseRedirect(reverse('systemview', args=(type_id, system_id))) 
@@ -205,7 +205,7 @@ def commentadd(request, type_id, system_id, graphic_id=0, source='a'):
                 cd = form.cleaned_data
                 type = Aircrafttype.objects.get(id=type_id)
                 system = Aircraftsystem.objects.get(id=system_id)
-                query = Comments(source=source, source_id=system_id, comment=cd['comment'], created_by=cd['user'],)
+                query = Comments(source=source, source_id=system_id, comment=cd['comment'], created_by=cd['user'], comment_type='system',)
                 query.save()
                 return HttpResponseRedirect(reverse('systemview', args=(type_id, system_id)))    
         else:
@@ -221,7 +221,7 @@ def commentadd(request, type_id, system_id, graphic_id=0, source='a'):
                 type = Aircrafttype.objects.get(id=type_id)
                 system = Aircraftsystem.objects.get(id=system_id)
                 graphic = Systemgraphic.objects.get(id=graphic_id)
-                query = Comments(source=source, source_id=graphic_id, comment=cd['comment'], created_by=cd['user'],)
+                query = Comments(source=source, source_id=graphic_id, comment=cd['comment'], created_by=cd['user'], comment_type=commenttype,)
                 query.save()
                 return HttpResponseRedirect(reverse('graphicview', args=(type_id, system_id, graphic_id)))    
         else:
