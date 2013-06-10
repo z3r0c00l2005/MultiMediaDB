@@ -9,6 +9,7 @@
         <li><a href="{% url 'workadd' aircrafttype.id system.id graphic.id %}">Add Work Done</a></li>
         <li><a href="{% url 'graphichold' aircrafttype.id system.id graphic.id %}">Toggle Hold Status</a></li>
         <li><a href="{% url 'graphicdone' aircrafttype.id system.id graphic.id %}">Mark Completed</a></li>
+         <li><a href="{% url 'commentadd' aircrafttype.id system.id graphic.id 'graphic' %}">New Comment</a></li>
 		<li><a href='#'>Logout</a></li>
 	</ul>
 </div>
@@ -56,11 +57,35 @@
 		</td>
 	</tr>
 {% empty %}
-    <tr>
-        <td>No Graphics Defined!</td>
-    </tr>
+
 {% endfor %}
 	
 </div>
+<div class="related">
 
+{% for comment in comments %}
+    {% if forloop.first %}   
+    <h3>Comments</h3> 
+ 	<table cellpadding = "0" cellspacing = "0">
+    <tr>
+			<th>Comment</th>
+			<th>Created By</th>
+    		<th>Created On</th>
+			<th class="actions">Actions</th>
+	</tr>
+    {% endif %}
+	<tr>
+		<td>{{ comment.comment }}&nbsp;</td>
+		<td>{{ comment.created_by }}&nbsp;</td>
+		<td>{{ comment.created_on }}&nbsp;</td>
+       	<td class="actions">
+			<a href='#'>Edit</a>
+		</td>
+	</tr>
+	
+{% empty %}
+{% endfor %}
+</table>
+
+</div>
 {% endblock %}

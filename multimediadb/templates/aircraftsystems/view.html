@@ -7,6 +7,7 @@
 	<ul>
 		<li><a href="{% url 'typeview' aircrafttype.id %}">All Aircraft Systems</a></li>
         <li><a href="{% url 'graphicadd' aircrafttype.id system.id %}">New Graphic</a></li>
+        <li><a href="{% url 'commentadd' aircrafttype.id system.id 0 'system' %}">New Comment</a></li>
 		<li><a href='#'>Logout</a></li>
 	</ul>
 </div>
@@ -122,4 +123,32 @@
 
 </div>
 
+
+<div class="related">
+
+{% for comment in comments %}
+    {% if forloop.first %}   
+    <h3>Comments</h3> 
+ 	<table cellpadding = "0" cellspacing = "0">
+    <tr>
+			<th>Comment</th>
+			<th>Created By</th>
+    		<th>Created On</th>
+			<th class="actions">Actions</th>
+	</tr>
+    {% endif %}
+	<tr>
+		<td>{{ comment.comment }}&nbsp;</td>
+		<td>{{ comment.created_by }}&nbsp;</td>
+		<td>{{ comment.created_on }}&nbsp;</td>
+       	<td class="actions">
+			<a href='#'>Edit</a>
+		</td>
+	</tr>
+	
+{% empty %}
+{% endfor %}
+</table>
+
+</div>
 {% endblock %}

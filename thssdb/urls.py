@@ -23,6 +23,7 @@ urlpatterns = patterns('',
 	url(r'^systems/add/(?P<type_id>\d+)/', views.systemadd, name='systemadd'),
 	url(r'^systems/(?P<type_id>\d+)/(?P<system_id>\d+)/', views.systemview, name='systemview'),
     url(r'^systems/edit/(?P<type_id>\d+)/(?P<system_id>\d+)/', views.systemedit, name='systemedit'),
+    url(r'^systems/comment/system/(?P<type_id>\d+)/(?P<system_id>\d+)/', views.commentadd, name='systemcommentadd'),
     
     url(r'^graphics/add/(?P<type_id>\d+)/(?P<system_id>\d+)/', views.graphicadd, name='graphicadd'),
     url(r'^graphics/edit/(?P<type_id>\d+)/(?P<system_id>\d+)/(?P<graphic_id>\d+)/', views.graphicedit, name='graphicedit'),
@@ -32,4 +33,6 @@ urlpatterns = patterns('',
         
     url(r'^work/add/(?P<type_id>\d+)/(?P<system_id>\d+)/(?P<graphic_id>\d+)/', views.workadd, name='workadd'),
     url(r'^work/edit/(?P<type_id>\d+)/(?P<system_id>\d+)/(?P<graphic_id>\d+)/(?P<work_id>\d+)/', views.workedit, name='workedit'),
+    
+    url(r'^comment/(?P<type_id>\d+)/(?P<system_id>\d+)/(?P<graphic_id>\d+)/(?P<source>\w+)/', views.commentadd, name='commentadd'),
     )

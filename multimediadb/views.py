@@ -82,7 +82,9 @@ def systemview(request, type_id, system_id):
     adjest = Systemgraphic.objects.filter(aircraftsystem_id=system_id).aggregate(adjustedestimate=Sum('adjusted_hours'))
     est = Systemgraphic.objects.filter(aircraftsystem_id=system_id).aggregate(estimate=Sum('estimated_hours'))
     booked = Graphicworkdone.objects.filter(systemgraphic_id__in=allgraphics).aggregate(booked=Sum('hours_expended'))
-    return render(request, 'aircraftsystems/view.html', {'aircrafttype': type, 'system': system, 'allgraphics': allgraphics, 'graphics': graphics, 'holdgraphics': holdgraphics, 'inqa': inqa, 'completed': complete, 'adjest': adjest, 'est': est, 'booked': booked,})
+    # Tables of comments
+    comments = Comments.objects.filter(source='system', source_id=system_id,)
+    return render(request, 'aircraftsystems/view.html', {'aircrafttype': type, 'system': system, 'allgraphics': allgraphics, 'graphics': graphics, 'holdgraphics': holdgraphics, 'inqa': inqa, 'completed': complete, 'adjest': adjest, 'est': est, 'booked': booked, 'comments': comments,})
     
 # ################
 # Graphic Views  #
@@ -126,7 +128,8 @@ def graphicview(request, type_id, system_id, graphic_id):
     system = Aircraftsystem.objects.get(pk=system_id)
     graphic = Systemgraphic.objects.get(pk=graphic_id)
     works = Graphicworkdone.objects.filter(systemgraphic_id=graphic_id)
-    return render(request, 'systemgraphics/view.html', {'aircrafttype': type, 'system': system, 'graphic': graphic, 'works': works,})
+    comments = Comments.objects.filter(source='graphic', source_id=graphic_id,)
+    return render(request, 'systemgraphics/view.html', {'aircrafttype': type, 'system': system, 'graphic': graphic, 'works': works, 'comments': comments,})
 
 def graphicdone(request, type_id, system_id, graphic_id):
     type = Aircrafttype.objects.get(pk=type_id)
@@ -186,3 +189,52 @@ def workedit(request, type_id, system_id, graphic_id, work_id):
         dictionary = model_to_dict(work, fields=[], exclude=[])
         form = WorkEditForm(initial=dictionary)
     return render(request, 'graphicwork/edit.html', {'form': form})
+    
+    
+# ################
+# Comment Views  #
+# ################
+    
+def commentadd(request, type_id, system_id, graphic_id=0, source='a'):
+    if source == 'system':
+        if 'cancel' in request.POST:
+                return HttpResponseRedirect(reverse('systemview', args=(type_id, system_id))) 
+        if request.method == 'POST':
+            form = CommentAddForm(request.POST)
+            if form.is_valid():
+                cd = form.cleaned_data
+                type = Aircrafttype.objects.get(id=type_id)
+                system = Aircraftsystem.objects.get(id=system_id)
+                query = Comments(source=source, source_id=system_id, comment=cd['comment'], created_by=cd['user'],)
+                query.save()
+                return HttpResponseRedirect(reverse('systemview', args=(type_id, system_id)))    
+        else:
+            form = CommentAddForm()
+        return render(request, 'comments/add.html', {'form': form})
+    else:
+        if 'cancel' in request.POST:
+                return HttpResponseRedirect(reverse('graphicview', args=(type_id, system_id, graphic_id)))
+        if request.method == 'POST':
+            form = CommentAddForm(request.POST)
+            if form.is_valid():
+                cd = form.cleaned_data
+                type = Aircrafttype.objects.get(id=type_id)
+                system = Aircraftsystem.objects.get(id=system_id)
+                graphic = Systemgraphic.objects.get(id=graphic_id)
+                query = Comments(source=source, source_id=graphic_id, comment=cd['comment'], created_by=cd['user'],)
+                query.save()
+                return HttpResponseRedirect(reverse('graphicview', args=(type_id, system_id, graphic_id)))    
+        else:
+            form = CommentAddForm()
+        return render(request, 'comments/add.html', {'form': form})    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
