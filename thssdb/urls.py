@@ -33,11 +33,14 @@ urlpatterns = patterns('',
     url(r'^graphics/view/(?P<type_id>\d+)/(?P<system_id>\d+)/(?P<graphic_id>\d+)/', views.graphicview, name='graphicview'),
     url(r'^graphics/hold/(?P<type_id>\d+)/(?P<system_id>\d+)/(?P<graphic_id>\d+)/', views.graphicholdtoggle, name='graphichold'),
     url(r'^graphics/done/(?P<type_id>\d+)/(?P<system_id>\d+)/(?P<graphic_id>\d+)/', views.graphicdone, name='graphicdone'),
+
+    url(r'^graphics/qa/(?P<type_id>\d+)/(?P<system_id>\d+)/(?P<graphic_id>\d+)/', views.qaview, name='qaview'),
         
     url(r'^work/add/(?P<type_id>\d+)/(?P<system_id>\d+)/(?P<graphic_id>\d+)/', views.workadd, name='workadd'),
     url(r'^work/edit/(?P<type_id>\d+)/(?P<system_id>\d+)/(?P<graphic_id>\d+)/(?P<work_id>\d+)/', views.workedit, name='workedit'),
     
-    url(r'^comment/(?P<type_id>\d+)/(?P<system_id>\d+)/(?P<graphic_id>\d+)/(?P<source>\w+)/(?P<commenttype>\w+)/', views.commentadd, name='commentadd'),
+    url(r'^comment/(?P<type_id>\d+)/(?P<system_id>\d+)/(?P<graphic_id>\d+)/(?P<graphic_version>\d+)/(?P<source>\w+)/(?P<commenttype>\w+)/', views.commentadd, name='commentadd'),
+    
     url(r'^upload/(?P<type_id>\d+)/(?P<system_id>\d+)/(?P<graphic_id>\d+)/(?P<source>\w+)/', views.upload, name='uploadadd'),
     url(r'^download/(?P<pk>\d+)/', views.download_handler, name='download'),
     ) + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -34,7 +34,7 @@ class Systemgraphic(models.Model):
     )
     aircraftsystem = models.ForeignKey(Aircraftsystem)
     media_label = models.CharField(max_length=100)
-    version= models.SmallIntegerField(default='00')
+    version = models.SmallIntegerField(default='00')
     title = models.CharField(max_length=30)
     description = models.CharField(max_length=50)
     estimated_hours = models.DecimalField(max_digits=5, decimal_places=2)
@@ -61,6 +61,7 @@ class Comments(models.Model):
     source = models.CharField(max_length=50)
     source_id = models.PositiveIntegerField()
     comment = models.TextField()
+    comment_version = models.PositiveIntegerField()
     comment_type = models.CharField(max_length=50)
     created_by = models.CharField(max_length=50)
     modified_by = models.CharField(max_length=50)
@@ -78,4 +79,15 @@ class Uploads(models.Model):
     def __unicode__(self):
         return u'%s' % (self.description)    
     
+class QA(models.Model):
+    systemgraphic = models.ForeignKey(Systemgraphic)
+    qa_stage = models.CharField(max_length=255)
+    qa_version = models.PositiveIntegerField()
+    created_by = models.CharField(max_length=50)
+    modified_by = models.CharField(max_length=50)
+    created = models.DateTimeField(auto_now_add=True, auto_now=False)
+    modified = models.DateTimeField(auto_now=True, auto_now_add=False)
+        
+    def __unicode__(self):
+        return u'%s - %s' % (self.systemgraphic, self.qa_stage)
     

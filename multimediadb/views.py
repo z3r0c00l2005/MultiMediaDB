@@ -7,7 +7,7 @@ from django.contrib import messages
 from filetransfers.api import prepare_upload, serve_file
 
 import datetime
-from multimediadb.models import Aircrafttype, Aircraftsystem, Systemgraphic, Graphicworkdone, Comments, Uploads
+from multimediadb.models import Aircrafttype, Aircraftsystem, Systemgraphic, Graphicworkdone, Comments, Uploads, QA
 from multimediadb.forms import TypeAddForm, SystemAddForm, SystemEditForm, GraphicAddForm, GraphicEditForm, WorkAddForm, WorkEditForm, CommentAddForm, CommentEditForm, UploadForm
 
 # ################
@@ -200,7 +200,7 @@ def workedit(request, type_id, system_id, graphic_id, work_id):
 # Comment Views  #
 # ################
     
-def commentadd(request, type_id, system_id, graphic_id=0, source='a', commenttype='a'):
+def commentadd(request, type_id, system_id, graphic_id=0, graphic_version=0, source='a', commenttype='a'):
     if source == 'system':
         if 'cancel' in request.POST:
                 return HttpResponseRedirect(reverse('systemview', args=(type_id, system_id))) 
@@ -216,7 +216,7 @@ def commentadd(request, type_id, system_id, graphic_id=0, source='a', commenttyp
         else:
             form = CommentAddForm()
         return render(request, 'comments/add.html', {'form': form})
-    else:
+    elif commenttype == 'Development':
         if 'cancel' in request.POST:
                 return HttpResponseRedirect(reverse('graphicview', args=(type_id, system_id, graphic_id)))
         if request.method == 'POST':
@@ -226,9 +226,25 @@ def commentadd(request, type_id, system_id, graphic_id=0, source='a', commenttyp
                 type = Aircrafttype.objects.get(id=type_id)
                 system = Aircraftsystem.objects.get(id=system_id)
                 graphic = Systemgraphic.objects.get(id=graphic_id)
-                query = Comments(source=source, source_id=graphic_id, comment=cd['comment'], created_by=cd['user'], comment_type=commenttype,)
+                query = Comments(source=source, source_id=graphic_id, comment=cd['comment'], created_by=cd['user'], comment_type=commenttype, comment_version=graphic_version,)
                 query.save()
                 return HttpResponseRedirect(reverse('graphicview', args=(type_id, system_id, graphic_id)))    
+        else:
+            form = CommentAddForm()
+        return render(request, 'comments/add.html', {'form': form})    
+    else:
+        if 'cancel' in request.POST:
+                return HttpResponseRedirect(reverse('qaview', args=(type_id, system_id, graphic_id)))
+        if request.method == 'POST':
+            form = CommentAddForm(request.POST)
+            if form.is_valid():
+                cd = form.cleaned_data
+                type = Aircrafttype.objects.get(id=type_id)
+                system = Aircraftsystem.objects.get(id=system_id)
+                graphic = Systemgraphic.objects.get(id=graphic_id)
+                query = Comments(source=source, source_id=graphic_id, comment=cd['comment'], created_by=cd['user'], comment_type=commenttype, comment_version=graphic_version,)
+                query.save()
+                return HttpResponseRedirect(reverse('qaview', args=(type_id, system_id, graphic_id)))    
         else:
             form = CommentAddForm()
         return render(request, 'comments/add.html', {'form': form})    
@@ -280,4 +296,35 @@ def upload(request, type_id, system_id, graphic_id=0, source='a'):
 def download_handler(request, pk):
     upload = get_object_or_404(Uploads, pk=pk)
     return serve_file(request, upload.file)    
+    
+    
+# ################
+# QA Views       #
+# ################    
+    
+def qaview(request, type_id, system_id, graphic_id):
+    type = Aircrafttype.objects.get(pk=type_id)
+    system = Aircraftsystem.objects.get(pk=system_id)
+    graphic = Systemgraphic.objects.get(pk=graphic_id)
+    comments = Comments.objects.filter(source='graphic', source_id=graphic_id,)
+    uploads = Uploads.objects.filter(source='graphic', source_id=graphic_id,)
+    qa = QA.objects.filter(systemgraphic=graphic.id, qa_version=graphic.version)
+
+    # If No QA for the current version, create the records    
+    if qa.count() < 5:
+        row = QA(systemgraphic=graphic, qa_version=graphic.version,qa_stage='TechnicalReview' )
+        row.save()
+        row = QA(systemgraphic=graphic, qa_version=graphic.version,qa_stage='EditorialReview' )
+        row.save()
+        row = QA(systemgraphic=graphic, qa_version=graphic.version,qa_stage='InternalQA' )
+        row.save()
+        row = QA(systemgraphic=graphic, qa_version=graphic.version,qa_stage='UploadedToLCMS' )
+        row.save()
+        row = QA(systemgraphic=graphic, qa_version=graphic.version,qa_stage='ExternalReview' )
+        row.save()    
+    
+    qas = QA.objects.filter(systemgraphic=graphic.id, qa_version=graphic.version)
+    
+    return render(request, 'qa/view.html', {'aircrafttype': type, 'system': system, 'graphic': graphic, 'qas': qas, 'comments': comments, 'uploads': uploads,})
+
 
