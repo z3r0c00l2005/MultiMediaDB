@@ -1,12 +1,15 @@
 from django.http import HttpResponse, Http404, HttpResponseRedirect
 from django.core.urlresolvers import reverse
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.forms.models import model_to_dict
 from django.db.models import Sum
 from django.contrib import messages
+from filetransfers.api import prepare_upload, serve_file
+
 import datetime
-from multimediadb.models import Aircrafttype, Aircraftsystem, Systemgraphic, Graphicworkdone, Comments
-from multimediadb.forms import TypeAddForm, SystemAddForm, SystemEditForm, GraphicAddForm, GraphicEditForm, WorkAddForm, WorkEditForm, CommentAddForm, CommentEditForm
+from multimediadb.models import Aircrafttype, Aircraftsystem, Systemgraphic, Graphicworkdone, Comments, Uploads
+from multimediadb.forms import TypeAddForm, SystemAddForm, SystemEditForm, GraphicAddForm, GraphicEditForm, WorkAddForm, WorkEditForm, CommentAddForm, CommentEditForm, UploadForm
+
 # ################
 # Type Views     #
 # ################
@@ -84,7 +87,8 @@ def systemview(request, type_id, system_id):
     booked = Graphicworkdone.objects.filter(systemgraphic_id__in=allgraphics).aggregate(booked=Sum('hours_expended'))
     # Tables of comments
     comments = Comments.objects.filter(source='system', source_id=system_id,)
-    return render(request, 'aircraftsystems/view.html', {'aircrafttype': type, 'system': system, 'allgraphics': allgraphics, 'graphics': graphics, 'holdgraphics': holdgraphics, 'inqa': inqa, 'completed': complete, 'adjest': adjest, 'est': est, 'booked': booked, 'comments': comments,})
+    uploads = Uploads.objects.filter(source='system', source_id=system_id,)
+    return render(request, 'aircraftsystems/view.html', {'aircrafttype': type, 'system': system, 'allgraphics': allgraphics, 'graphics': graphics, 'holdgraphics': holdgraphics, 'inqa': inqa, 'completed': complete, 'adjest': adjest, 'est': est, 'booked': booked, 'comments': comments, 'uploads': uploads,})
     
 # ################
 # Graphic Views  #
@@ -129,7 +133,8 @@ def graphicview(request, type_id, system_id, graphic_id):
     graphic = Systemgraphic.objects.get(pk=graphic_id)
     works = Graphicworkdone.objects.filter(systemgraphic_id=graphic_id)
     comments = Comments.objects.filter(source='graphic', source_id=graphic_id,)
-    return render(request, 'systemgraphics/view.html', {'aircrafttype': type, 'system': system, 'graphic': graphic, 'works': works, 'comments': comments,})
+    uploads = Uploads.objects.filter(source='graphic', source_id=graphic_id,)
+    return render(request, 'systemgraphics/view.html', {'aircrafttype': type, 'system': system, 'graphic': graphic, 'works': works, 'comments': comments, 'uploads': uploads,})
 
 def graphicdone(request, type_id, system_id, graphic_id):
     type = Aircrafttype.objects.get(pk=type_id)
@@ -228,13 +233,51 @@ def commentadd(request, type_id, system_id, graphic_id=0, source='a', commenttyp
             form = CommentAddForm()
         return render(request, 'comments/add.html', {'form': form})    
 
+# ################
+# Upload Views   #
+# ################
+        
     
+def upload(request, type_id, system_id, graphic_id=0, source='a'):
+    if source == 'system':
+        view_url = reverse('systemview', args=(type_id, system_id))
+        if 'cancel' in request.POST:
+            return HttpResponseRedirect(reverse('systemview', args=(type_id, system_id)))
+        # Handle file upload
+        if request.method == 'POST':
+            form = UploadForm(request.POST, request.FILES)
+            if form.is_valid():
+                cd = form.cleaned_data
+                type = Aircrafttype.objects.get(id=type_id)
+                system = Aircraftsystem.objects.get(id=system_id)
+                newdoc = Uploads(file = request.FILES['filename'], description=cd['description'], source=source, source_id=system_id )
+                newdoc.save()
+                # Redirect to the document list after POST
+                return HttpResponseRedirect(reverse('systemview', args=(type_id, system_id)))
+        else:
+            form = UploadForm() # A empty, unbound form
+        return render(request, 'uploads/add.html', {'form': form})
+    else:
+        view_url = reverse('graphicview', args=(type_id, system_id, graphic_id))
+        if 'cancel' in request.POST:
+            return HttpResponseRedirect(reverse('graphicview', args=(type_id, system_id, graphic_id)))
+        # Handle file upload
+        if request.method == 'POST':
+            form = UploadForm(request.POST, request.FILES)
+            if form.is_valid():
+                cd = form.cleaned_data
+                type = Aircrafttype.objects.get(id=type_id)
+                system = Aircraftsystem.objects.get(id=system_id)
+                newdoc = Uploads(file = request.FILES['filename'], description=cd['description'], source=source, source_id=graphic_id )
+                newdoc.save()
+                # Redirect to the document list after POST
+                return HttpResponseRedirect(reverse('graphicview', args=(type_id, system_id, graphic_id)))
+        else:
+            form = UploadForm() # A empty, unbound form
+        return render(request, 'uploads/add.html', {'form': form})
     
-    
-    
-    
-    
-    
-    
-    
-    
+
+def download_handler(request, pk):
+    upload = get_object_or_404(Uploads, pk=pk)
+    return serve_file(request, upload.file)    
+

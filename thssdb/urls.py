@@ -1,5 +1,8 @@
 from django.conf.urls import patterns, include, url
 from multimediadb import views
+from django.conf import settings
+from django.conf.urls.static import static
+
 
 # Uncomment the next two lines to enable the admin:
 from django.contrib import admin
@@ -35,4 +38,6 @@ urlpatterns = patterns('',
     url(r'^work/edit/(?P<type_id>\d+)/(?P<system_id>\d+)/(?P<graphic_id>\d+)/(?P<work_id>\d+)/', views.workedit, name='workedit'),
     
     url(r'^comment/(?P<type_id>\d+)/(?P<system_id>\d+)/(?P<graphic_id>\d+)/(?P<source>\w+)/(?P<commenttype>\w+)/', views.commentadd, name='commentadd'),
-    )
+    url(r'^upload/(?P<type_id>\d+)/(?P<system_id>\d+)/(?P<graphic_id>\d+)/(?P<source>\w+)/', views.upload, name='uploadadd'),
+    url(r'^download/(?P<pk>\d+)/', views.download_handler, name='download'),
+    ) + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

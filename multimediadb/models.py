@@ -69,3 +69,13 @@ class Comments(models.Model):
         
     def __unicode__(self):
         return u'%s - %s' % (self.source, self.source_id, self.comment)    
+        
+class Uploads(models.Model):
+    source = models.CharField(max_length=50)
+    source_id = models.PositiveIntegerField()
+    file = models.FileField(upload_to='uploads/')
+    description = models.CharField(max_length=50)
+    def __unicode__(self):
+        return u'%s' % (self.description)    
+    
+    

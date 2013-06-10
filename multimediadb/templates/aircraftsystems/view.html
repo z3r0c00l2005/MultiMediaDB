@@ -8,6 +8,7 @@
 		<li><a href="{% url 'typeview' aircrafttype.id %}">All Aircraft Systems</a></li>
         <li><a href="{% url 'graphicadd' aircrafttype.id system.id %}">New Graphic</a></li>
         <li><a href="{% url 'commentadd' aircrafttype.id system.id 0 'system' 'system' %}">New Comment</a></li>
+        <li><a href="{% url 'uploadadd' aircrafttype.id system.id 0 'system' %}">New Attachment</a></li>
 		<li><a href='#'>Logout</a></li>
 	</ul>
 </div>
@@ -25,7 +26,31 @@
            <dd><b>Estimated: </b>{{ est.estimate }}<b> Adjusted: </b>{{ adjest.adjustedestimate }}<b> Expended: </b>{{ booked.booked }}&nbsp;</dd>
        </dl>
 </div>
+<div class="related">
 
+{% for upload in uploads %}
+    {% if forloop.first %}   
+    <h3>Attachments</h3> 
+ 	<table cellpadding = "0" cellspacing = "0">
+    <tr>
+			<th>File</th>
+			<th>Description</th>
+			<th class="actions">Actions</th>
+	</tr>
+    {% endif %}
+	<tr>
+		<td>{{ upload.file }}&nbsp;</td>
+		<td>{{ upload.description }}&nbsp;</td>
+       	<td class="actions">
+			<a href="{% url 'download' pk=upload.pk %}">Download</a>
+		</td>
+	</tr>
+	
+{% empty %}
+{% endfor %}
+</table>
+
+</div>
 <div class="related">
     <h3>Graphics</h3>
 {% for graphic in graphics %}
@@ -151,4 +176,6 @@
 </table>
 
 </div>
+
+
 {% endblock %}

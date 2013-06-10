@@ -52,3 +52,6 @@ class CommentEditForm(forms.Form):
     comment = forms.CharField(max_length=600)
     user = forms.CharField(max_length=50)
     
+class UploadForm(forms.Form):
+    filename = forms.FileField(required=False)
+    description = forms.CharField(max_length=50)

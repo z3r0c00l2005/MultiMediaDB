@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block title %}Add Attachment{% endblock %}
+{% block header %}Add Attachment{% endblock %}
+{% block content %}
+<div class="actions">
+	<ul>
+		<li><a href='#'>Logout</a></li>
+	</ul>
+</div>
+
+<div class="aircraftgraphics form">
+	<h2>Add Attachment</h2>
+	
+	{% if form.errors %}
+        <p style="color: red;">
+            Please correct the error{{ form.errors|pluralize }} below.
+        </p>
+    {% endif %}
+
+   <form action="" method="POST" enctype="multipart/form-data">
+
+        <div class="field">
+            {{ form.description.errors }}
+            <label for="description">Description:</label>
+            {{ form.description }}
+        </div>
+        <div class="field">
+            {{ form.filename.errors }}
+            <label for="filename">File:</label>
+            {{ form.filename }}
+        </div>    
+        <div class="submit">
+        <input type="submit" name="submit" value="Upload">
+        <input type="submit" name="cancel" value="Cancel">
+    </div>
+    </form>
+</div>
+
+{% endblock %}
