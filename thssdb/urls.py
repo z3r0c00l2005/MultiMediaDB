@@ -1,4 +1,5 @@
 from django.conf.urls import patterns, include, url
+from django.contrib.auth.views import login, logout
 from multimediadb import views
 from django.conf import settings
 from django.conf.urls.static import static
@@ -11,14 +12,11 @@ admin.autodiscover()
 urlpatterns = patterns('',
     # Examples:
     url(r'^$', 'thssdb.views.home', name='home'),
-    # url(r'^thssdb/', include('thssdb.foo.urls')),
 
-    # Uncomment the admin/doc line below to enable admin documentation:
-    # url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
-
-    # Uncomment the next line to enable the admin:
     url(r'^admin/', include(admin.site.urls)),
-	
+	url(r'^accounts/login/$',  login, name='login'),
+    url(r'^accounts/logout/$', views.logout_view, name='logout'),
+    
     url(r'^types/$', views.typeindex, name='typeindex'),
     url(r'^types/add$', views.typeadd, name='typeadd'),
     url(r'^types/(?P<type_id>\d+)/', views.typeview, name='typeview'),
