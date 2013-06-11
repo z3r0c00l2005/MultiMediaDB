@@ -35,6 +35,7 @@ urlpatterns = patterns('',
     url(r'^graphics/done/(?P<type_id>\d+)/(?P<system_id>\d+)/(?P<graphic_id>\d+)/', views.graphicdone, name='graphicdone'),
 
     url(r'^graphics/qa/(?P<type_id>\d+)/(?P<system_id>\d+)/(?P<graphic_id>\d+)/', views.qaview, name='qaview'),
+    url(r'^graphics/qaresult/(?P<type_id>\d+)/(?P<system_id>\d+)/(?P<graphic_id>\d+)/(?P<graphic_version>\d+)/(?P<stage>\w+)/(?P<qa_id>\d+)/(?P<result>\w+)/', views.qaresult, name='qaresult'),
         
     url(r'^work/add/(?P<type_id>\d+)/(?P<system_id>\d+)/(?P<graphic_id>\d+)/', views.workadd, name='workadd'),
     url(r'^work/edit/(?P<type_id>\d+)/(?P<system_id>\d+)/(?P<graphic_id>\d+)/(?P<work_id>\d+)/', views.workedit, name='workedit'),

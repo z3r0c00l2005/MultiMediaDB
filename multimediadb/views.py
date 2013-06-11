@@ -79,8 +79,8 @@ def systemview(request, type_id, system_id):
     allgraphics = Systemgraphic.objects.filter(aircraftsystem_id=system_id)
     holdgraphics = Systemgraphic.objects.filter(aircraftsystem_id=system_id).filter(status__in=['Not Started','In Progress']).filter(on_hold=1)
     graphics = Systemgraphic.objects.filter(aircraftsystem_id=system_id).filter(status__in=['Not Started','In Progress'])
-    inqa = Systemgraphic.objects.filter(aircraftsystem_id=system_id, status__in=['Development Completed','Tech Review Pass','Edit Review Pass','Internal QA Pass','Uploaded LCMS'])
-    complete = Systemgraphic.objects.filter(aircraftsystem_id=system_id).filter(status__in=['External Review Pass'])
+    inqa = Systemgraphic.objects.filter(aircraftsystem_id=system_id, status__in=['Development Completed','TechnicalReview','EditorialReview','InternalQA','UploadedToLCMS','ExternalReview'])
+    complete = Systemgraphic.objects.filter(aircraftsystem_id=system_id).filter(status__in=['Locked'])
     # Header Calculations
     adjest = Systemgraphic.objects.filter(aircraftsystem_id=system_id).aggregate(adjustedestimate=Sum('adjusted_hours'))
     est = Systemgraphic.objects.filter(aircraftsystem_id=system_id).aggregate(estimate=Sum('estimated_hours'))
@@ -308,23 +308,78 @@ def qaview(request, type_id, system_id, graphic_id):
     graphic = Systemgraphic.objects.get(pk=graphic_id)
     comments = Comments.objects.filter(source='graphic', source_id=graphic_id,)
     uploads = Uploads.objects.filter(source='graphic', source_id=graphic_id,)
-    qa = QA.objects.filter(systemgraphic=graphic.id, qa_version=graphic.version)
+    qa = QA.objects.filter(systemgraphic=graphic.id, qa_version=graphic.version).order_by('id').reverse()[:1]
 
-    # If No QA for the current version, create the records    
-    if qa.count() < 5:
+    if qa.count() == 0:
         row = QA(systemgraphic=graphic, qa_version=graphic.version,qa_stage='TechnicalReview' )
         row.save()
+        Systemgraphic.objects.filter(id=graphic_id).update(status='TechnicalReview',)
+        qa2 = qa.get()
+    else:
+        qa2 = qa.get()
+    
+    if qa2.qa_stage == 'TechnicalReview' and qa2.result == 'Pass':
         row = QA(systemgraphic=graphic, qa_version=graphic.version,qa_stage='EditorialReview' )
         row.save()
+        Systemgraphic.objects.filter(id=graphic_id).update(status='EditorialReview',)
+        
+        
+    if qa2.qa_stage == 'EditorialReview' and qa2.result == 'Pass':
         row = QA(systemgraphic=graphic, qa_version=graphic.version,qa_stage='InternalQA' )
         row.save()
+        Systemgraphic.objects.filter(id=graphic_id).update(status='InternalQA',)
+        
+        
+    if qa2.qa_stage == 'InternalQA' and qa2.result == 'Pass':
         row = QA(systemgraphic=graphic, qa_version=graphic.version,qa_stage='UploadedToLCMS' )
         row.save()
-        row = QA(systemgraphic=graphic, qa_version=graphic.version,qa_stage='ExternalReview' )
-        row.save()    
-    
-    qas = QA.objects.filter(systemgraphic=graphic.id, qa_version=graphic.version)
-    
+        Systemgraphic.objects.filter(id=graphic_id).update(status='UploadedToLCMS',)
+        
+    if qa2.qa_stage == 'UploadedToLCMS' and qa2.result == 'Pass':
+        Systemgraphic.objects.filter(id=graphic_id).update(status='ExternalReview',)
+        
+    if qa2.result == 'Fail':
+        row = QA(systemgraphic=graphic, qa_version=graphic.version,qa_stage='TechnicalReview' )
+        row.save()
+        Systemgraphic.objects.filter(id=graphic_id).update(status='TechnicalReview',)    
+
+    qas = QA.objects.filter(systemgraphic=graphic.id).order_by('id')
     return render(request, 'qa/view.html', {'aircrafttype': type, 'system': system, 'graphic': graphic, 'qas': qas, 'comments': comments, 'uploads': uploads,})
 
 
+def qaresult(request, type_id, system_id, graphic_id, graphic_version, stage, qa_id, result):
+    type = Aircrafttype.objects.get(pk=type_id)
+    system = Aircraftsystem.objects.get(pk=system_id)
+    graphic = Systemgraphic.objects.get(pk=graphic_id)
+    
+    if result == 'Pass':
+        if stage == 'UploadedToLCMS':
+            Systemgraphic.objects.filter(id=graphic_id).update(version = int(graphic_version) + 1,)
+            row = QA(systemgraphic=graphic, qa_version=graphic.version + 1,qa_stage='ExternalReview' )
+            row.save()
+        if stage == 'ExternalReview':
+            Systemgraphic.objects.filter(id=graphic_id).update(status='Locked',)
+            QA.objects.filter(pk=qa_id).update(result=result, created_by='TEST')
+            return redirect('systemview', type_id=type.id, system_id=system.id)
+        QA.objects.filter(pk=qa_id).update(result=result, created_by='TEST')
+    else:
+        QA.objects.filter(pk=qa_id).update(result=result, created_by='TEST')
+        Systemgraphic.objects.filter(id=graphic_id).update(status='In Progress',)
+        return redirect('systemview', type_id=type.id, system_id=system.id)
+    
+    return redirect('qaview', type_id=type.id, system_id=system.id, graphic_id=graphic.id)
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    

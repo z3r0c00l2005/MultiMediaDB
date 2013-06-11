@@ -28,34 +28,7 @@
            <dd>{{ graphic.status }}&nbsp;</dd>
        </dl>
 </div>
-<div class="related">
 
-{% for upload in uploads %}
-    {% if forloop.first %}   
-     
- 	<table cellpadding = "0" cellspacing = "0">
- 	<tr>
-        <td><h3>Attachments</h3></td>
-    </tr>
-    <tr>
-			<th>File</th>
-			<th>Description</th>
-			<th class="actions">Actions</th>
-	</tr>
-    {% endif %}
-	<tr>
-		<td>{{ upload.file }}&nbsp;</td>
-		<td>{{ upload.description }}&nbsp;</td>
-       	<td class="actions">
-			<a href="{% url 'download' pk=upload.pk %}">Download</a>
-		</td>
-	</tr>
-	
-{% empty %}
-{% endfor %}
-</table>
-
-</div>
 <div class="related">
 	{% for qa in qas %}
     {% if forloop.first %}    
@@ -77,12 +50,14 @@
 		<td>{{ qa.qa_version|stringformat:'02d' }}&nbsp;</td>
 		<td>{{ qa.qa_stage }}&nbsp;</td>
 		<td>{{ qa.created_by }}&nbsp;</td>
-        <td>{{ qa.created_on }}&nbsp;</td>
+        <td>{{ qa.modified }}&nbsp;</td>
         <td>{{ qa.result }}&nbsp;</td>
-    <td class="actions">
-    <a href="{% url 'commentadd' aircrafttype.id system.id graphic.id graphic.version 'graphic' qa.qa_stage %}">Comment</a>
-  	<a href='#'>PASS</a>
-  	<a href='#'>FAIL</a>
+        <td class="actions">
+        {% if forloop.last %}  
+            <a href="{% url 'commentadd' aircrafttype.id system.id graphic.id graphic.version 'graphic' qa.qa_stage %}">Comment</a>
+  	        <a href="{% url 'qaresult' aircrafttype.id system.id graphic.id graphic.version qa.qa_stage qa.id 'Pass' %}">PASS</a>
+  	        <a href="{% url 'qaresult' aircrafttype.id system.id graphic.id graphic.version qa.qa_stage qa.id 'Fail' %}">FAIL</a>
+		{% endif %}
 		</td>
 	</tr>
 {% empty %}
@@ -115,9 +90,38 @@
 	    <td>{{ comment.comment_version|stringformat:'02d' }}&nbsp;</td>
 		<td>{{ comment.comment }}&nbsp;</td>
 		<td>{{ comment.created_by }}&nbsp;</td>
-		<td>{{ comment.created_on }}&nbsp;</td>
+		<td>{{ comment.created }}&nbsp;</td>
        	<td class="actions">
 			<a href='#'>Edit</a>
+		</td>
+	</tr>
+	
+{% empty %}
+{% endfor %}
+</table>
+
+</div>
+
+<div class="related">
+
+{% for upload in uploads %}
+    {% if forloop.first %}   
+     
+ 	<table cellpadding = "0" cellspacing = "0">
+ 	<tr>
+        <td><h3>Attachments</h3></td>
+    </tr>
+    <tr>
+			<th>File</th>
+			<th>Description</th>
+			<th class="actions">Actions</th>
+	</tr>
+    {% endif %}
+	<tr>
+		<td>{{ upload.file }}&nbsp;</td>
+		<td>{{ upload.description }}&nbsp;</td>
+       	<td class="actions">
+			<a href="{% url 'download' pk=upload.pk %}">Download</a>
 		</td>
 	</tr>
 	

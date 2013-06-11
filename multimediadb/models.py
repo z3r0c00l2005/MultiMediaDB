@@ -83,6 +83,7 @@ class QA(models.Model):
     systemgraphic = models.ForeignKey(Systemgraphic)
     qa_stage = models.CharField(max_length=255)
     qa_version = models.PositiveIntegerField()
+    result = models.CharField(max_length=5)
     created_by = models.CharField(max_length=50)
     modified_by = models.CharField(max_length=50)
     created = models.DateTimeField(auto_now_add=True, auto_now=False)
