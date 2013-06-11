@@ -11,8 +11,8 @@ admin.autodiscover()
 
 urlpatterns = patterns('',
     # Examples:
-    url(r'^$', 'thssdb.views.home', name='home'),
-
+    url(r'^$', views.typeindex, name='home'),
+    
     url(r'^admin/', include(admin.site.urls)),
 	url(r'^accounts/login/$',  login, name='login'),
     url(r'^accounts/logout/$', views.logout_view, name='logout'),

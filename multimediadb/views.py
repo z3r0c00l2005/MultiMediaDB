@@ -5,6 +5,7 @@ from django.forms.models import model_to_dict
 from django.db.models import Sum
 from django.contrib import messages
 from django.contrib.auth import logout
+from django.contrib.auth.decorators import login_required
 from filetransfers.api import prepare_upload, serve_file
 
 import datetime
@@ -14,15 +15,18 @@ from multimediadb.forms import TypeAddForm, SystemAddForm, SystemEditForm, Graph
 # ################
 # Type Views     #
 # ################
+@login_required
 def typeindex(request):
     types = Aircrafttype.objects.all()
     return render(request, 'aircrafttypes/index.html', {'types': types})
-    
+
+@login_required    
 def typeview(request, type_id):
     type = Aircrafttype.objects.get(pk=type_id)
     systems = Aircraftsystem.objects.filter(aircrafttype_id=type_id)
     return render(request, 'aircrafttypes/view.html', {'aircrafttype': type, 'systems': systems})
 
+@login_required
 def typeadd(request):
     if 'cancel' in request.POST:
             return HttpResponseRedirect(reverse('typeindex'))    
@@ -41,6 +45,7 @@ def typeadd(request):
 # System Views   #
 # ################
 	
+@login_required
 def systemadd(request, type_id):
     if 'cancel' in request.POST:
             return HttpResponseRedirect(reverse('typeview', args=(type_id,)))    
@@ -56,6 +61,7 @@ def systemadd(request, type_id):
         form = SystemAddForm()
     return render(request, 'aircraftsystems/add.html', {'form': form})
 
+@login_required
 def systemedit(request, type_id, system_id):
     if 'cancel' in request.POST:
             return HttpResponseRedirect(reverse('typeview', args=(type_id,)))   
@@ -72,7 +78,7 @@ def systemedit(request, type_id, system_id):
         form = SystemEditForm(initial=dictionary)
     return render(request, 'aircraftsystems/edit.html', {'form': form})
 
-	
+@login_required
 def systemview(request, type_id, system_id):
     type = Aircrafttype.objects.get(pk=type_id)
     system = Aircraftsystem.objects.get(pk=system_id)
@@ -94,7 +100,8 @@ def systemview(request, type_id, system_id):
 # ################
 # Graphic Views  #
 # ################
-    
+
+@login_required    
 def graphicadd(request, type_id, system_id):
     if 'cancel' in request.POST:
             return HttpResponseRedirect(reverse('systemview', args=(type_id, system_id)))    
@@ -110,7 +117,8 @@ def graphicadd(request, type_id, system_id):
     else:
         form = GraphicAddForm()
     return render(request, 'systemgraphics/add.html', {'form': form})
-    
+
+@login_required    
 def graphicedit(request, type_id, system_id, graphic_id):
     if 'cancel' in request.POST:
             return HttpResponseRedirect(reverse('systemview', args=(type_id, system_id)))    
@@ -128,6 +136,7 @@ def graphicedit(request, type_id, system_id, graphic_id):
         form = GraphicEditForm(initial=dictionary)
     return render(request, 'systemgraphics/edit.html', {'form': form})
 
+@login_required
 def graphicview(request, type_id, system_id, graphic_id):
     type = Aircrafttype.objects.get(pk=type_id)
     system = Aircraftsystem.objects.get(pk=system_id)
@@ -137,6 +146,7 @@ def graphicview(request, type_id, system_id, graphic_id):
     uploads = Uploads.objects.filter(source='graphic', source_id=graphic_id,)
     return render(request, 'systemgraphics/view.html', {'aircrafttype': type, 'system': system, 'graphic': graphic, 'works': works, 'comments': comments, 'uploads': uploads,})
 
+@login_required
 def graphicdone(request, type_id, system_id, graphic_id):
     type = Aircrafttype.objects.get(pk=type_id)
     system = Aircraftsystem.objects.get(pk=system_id)
@@ -145,6 +155,7 @@ def graphicdone(request, type_id, system_id, graphic_id):
     works = Graphicworkdone.objects.filter(systemgraphic_id=graphic_id)
     return redirect('systemview', type_id=type.id, system_id=system.id,)
 
+@login_required
 def graphicholdtoggle(request, type_id, system_id, graphic_id):
     type = Aircrafttype.objects.get(pk=type_id)
     system = Aircraftsystem.objects.get(pk=system_id)
@@ -159,7 +170,8 @@ def graphicholdtoggle(request, type_id, system_id, graphic_id):
 # ################
 # Work Views     #
 # ################
-    
+
+@login_required    
 def workadd(request, type_id, system_id, graphic_id):
     if 'cancel' in request.POST:
             return HttpResponseRedirect(reverse('graphicview', args=(type_id, system_id, graphic_id)))    
@@ -170,14 +182,15 @@ def workadd(request, type_id, system_id, graphic_id):
             type = Aircrafttype.objects.get(id=type_id)
             system = Aircraftsystem.objects.get(id=system_id)
             graphic = Systemgraphic.objects.get(id=graphic_id)
-            query = Graphicworkdone(systemgraphic=graphic, work_carried_out=cd['work_carried_out'], created_by=cd['user'], hours_expended=cd['hours_expended'],)
+            query = Graphicworkdone(systemgraphic=graphic, work_carried_out=cd['work_carried_out'], created_by=request.user.get_full_name(), hours_expended=cd['hours_expended'],)
             query.save()
             Systemgraphic.objects.filter(id=graphic_id).update(status='In Progress',)
             return HttpResponseRedirect(reverse('graphicview', args=(type_id, system_id, graphic_id)))    
     else:
         form = WorkAddForm()
     return render(request, 'graphicwork/add.html', {'form': form})
-    
+
+@login_required    
 def workedit(request, type_id, system_id, graphic_id, work_id):
     if 'cancel' in request.POST:
             return HttpResponseRedirect(reverse('graphicview', args=(type_id, system_id, graphic_id)))    
@@ -188,7 +201,7 @@ def workedit(request, type_id, system_id, graphic_id, work_id):
             type = Aircrafttype.objects.get(id=type_id)
             system = Aircraftsystem.objects.get(id=system_id)
             graphic = Systemgraphic.objects.get(id=graphic_id)
-            Graphicworkdone.objects.filter(id=work_id).update(systemgraphic=graphic, work_carried_out=cd['work_carried_out'], modified_by=cd['user'], hours_expended=cd['hours_expended'],)
+            Graphicworkdone.objects.filter(id=work_id).update(systemgraphic=graphic, work_carried_out=cd['work_carried_out'], modified_by=request.user.get_full_name(), hours_expended=cd['hours_expended'],)
             return HttpResponseRedirect(reverse('graphicview', args=(type_id, system_id, graphic_id)))    
     else:
         work = Graphicworkdone.objects.get(id=work_id)
@@ -200,7 +213,8 @@ def workedit(request, type_id, system_id, graphic_id, work_id):
 # ################
 # Comment Views  #
 # ################
-    
+
+@login_required    
 def commentadd(request, type_id, system_id, graphic_id=0, graphic_version=0, source='a', commenttype='a'):
     if source == 'system':
         if 'cancel' in request.POST:
@@ -211,7 +225,7 @@ def commentadd(request, type_id, system_id, graphic_id=0, graphic_version=0, sou
                 cd = form.cleaned_data
                 type = Aircrafttype.objects.get(id=type_id)
                 system = Aircraftsystem.objects.get(id=system_id)
-                query = Comments(source=source, source_id=system_id, comment=cd['comment'], created_by=cd['user'], comment_type='system',)
+                query = Comments(source=source, source_id=system_id, comment=cd['comment'], created_by=request.user.get_full_name(), comment_type='system',)
                 query.save()
                 return HttpResponseRedirect(reverse('systemview', args=(type_id, system_id)))    
         else:
@@ -227,7 +241,7 @@ def commentadd(request, type_id, system_id, graphic_id=0, graphic_version=0, sou
                 type = Aircrafttype.objects.get(id=type_id)
                 system = Aircraftsystem.objects.get(id=system_id)
                 graphic = Systemgraphic.objects.get(id=graphic_id)
-                query = Comments(source=source, source_id=graphic_id, comment=cd['comment'], created_by=cd['user'], comment_type=commenttype, comment_version=graphic_version,)
+                query = Comments(source=source, source_id=graphic_id, comment=cd['comment'], created_by=request.user.get_full_name(), comment_type=commenttype, comment_version=graphic_version,)
                 query.save()
                 return HttpResponseRedirect(reverse('graphicview', args=(type_id, system_id, graphic_id)))    
         else:
@@ -243,7 +257,7 @@ def commentadd(request, type_id, system_id, graphic_id=0, graphic_version=0, sou
                 type = Aircrafttype.objects.get(id=type_id)
                 system = Aircraftsystem.objects.get(id=system_id)
                 graphic = Systemgraphic.objects.get(id=graphic_id)
-                query = Comments(source=source, source_id=graphic_id, comment=cd['comment'], created_by=cd['user'], comment_type=commenttype, comment_version=graphic_version,)
+                query = Comments(source=source, source_id=graphic_id, comment=cd['comment'], created_by=request.user.get_full_name(), comment_type=commenttype, comment_version=graphic_version,)
                 query.save()
                 return HttpResponseRedirect(reverse('qaview', args=(type_id, system_id, graphic_id)))    
         else:
@@ -254,7 +268,7 @@ def commentadd(request, type_id, system_id, graphic_id=0, graphic_version=0, sou
 # Upload Views   #
 # ################
         
-    
+@login_required    
 def upload(request, type_id, system_id, graphic_id=0, source='a'):
     if source == 'system':
         view_url = reverse('systemview', args=(type_id, system_id))
@@ -293,7 +307,7 @@ def upload(request, type_id, system_id, graphic_id=0, source='a'):
             form = UploadForm() # A empty, unbound form
         return render(request, 'uploads/add.html', {'form': form})
     
-
+@login_required
 def download_handler(request, pk):
     upload = get_object_or_404(Uploads, pk=pk)
     return serve_file(request, upload.file)    
@@ -302,7 +316,8 @@ def download_handler(request, pk):
 # ################
 # QA Views       #
 # ################    
-    
+
+@login_required    
 def qaview(request, type_id, system_id, graphic_id):
     type = Aircrafttype.objects.get(pk=type_id)
     system = Aircraftsystem.objects.get(pk=system_id)
@@ -347,7 +362,7 @@ def qaview(request, type_id, system_id, graphic_id):
     qas = QA.objects.filter(systemgraphic=graphic.id).order_by('id')
     return render(request, 'qa/view.html', {'aircrafttype': type, 'system': system, 'graphic': graphic, 'qas': qas, 'comments': comments, 'uploads': uploads,})
 
-
+@login_required
 def qaresult(request, type_id, system_id, graphic_id, graphic_version, stage, qa_id, result):
     type = Aircrafttype.objects.get(pk=type_id)
     system = Aircraftsystem.objects.get(pk=system_id)
@@ -360,11 +375,11 @@ def qaresult(request, type_id, system_id, graphic_id, graphic_version, stage, qa
             row.save()
         if stage == 'ExternalReview':
             Systemgraphic.objects.filter(id=graphic_id).update(status='Locked',)
-            QA.objects.filter(pk=qa_id).update(result=result, created_by='TEST')
+            QA.objects.filter(pk=qa_id).update(result=result, created_by=request.user.get_full_name())
             return redirect('systemview', type_id=type.id, system_id=system.id)
-        QA.objects.filter(pk=qa_id).update(result=result, created_by='TEST')
+        QA.objects.filter(pk=qa_id).update(result=result, created_by=request.user.get_full_name())
     else:
-        QA.objects.filter(pk=qa_id).update(result=result, created_by='TEST')
+        QA.objects.filter(pk=qa_id).update(result=result, created_by=request.user.get_full_name())
         Systemgraphic.objects.filter(id=graphic_id).update(status='In Progress',)
         return redirect('systemview', type_id=type.id, system_id=system.id)
     
@@ -375,6 +390,7 @@ def qaresult(request, type_id, system_id, graphic_id, graphic_version, stage, qa
 # User Views     #
 # ################      
     
+@login_required
 def logout_view(request):
     logout(request)    
     return redirect('login')

@@ -36,21 +36,17 @@ class GraphicEditForm(forms.Form):
 
 class WorkAddForm(forms.Form):
     work_carried_out = forms.CharField(max_length=50)
-    user = forms.CharField(max_length=50)
     hours_expended = forms.DecimalField(max_digits=5, decimal_places=2)
     
 class WorkEditForm(forms.Form):
     work_carried_out = forms.CharField(max_length=50)
-    user = forms.CharField(max_length=50)
     hours_expended = forms.DecimalField(max_digits=5, decimal_places=2)
     
 class CommentAddForm(forms.Form):
     comment = forms.CharField(max_length=600)
-    user = forms.CharField(max_length=50)
     
 class CommentEditForm(forms.Form):
     comment = forms.CharField(max_length=600)
-    user = forms.CharField(max_length=50)
     
 class UploadForm(forms.Form):
     filename = forms.FileField(required=False)
