@@ -5,7 +5,9 @@
 {% block content %}
 <div class="actions">
 	<ul>
+	{% if perms.multimediadb.add_aircrafttype %}
 		<li><a href='{% url 'typeadd' %}'>New Aircraft Type</a></li>
+	{% endif %}
 		<li><a href="/admin">ADMIN</a></li>
 		<li><a href="{% url 'logout' %}">Logout</a></li>
 	</ul>
@@ -27,13 +29,13 @@
 		<td>{{ aircrafttype.description }}&nbsp;</td>
 		<td class="actions">
 			<a href="{% url 'typeview' aircrafttype.id %}">View</a>
+			{% if perms.multimediadb.change_aircrafttype %}
 			<a href='#'>Edit</a>
+			{% endif %}
 		</td>
 	</tr>
 {% empty %}
-    <tr>
-        <td>No Types Defined!</td>
-    </tr>
+
 {% endfor %}
 	</table>
 	{% comment %}

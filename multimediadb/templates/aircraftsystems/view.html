@@ -6,10 +6,16 @@
 <div class="actions">
 	<ul>
 		<li><a href="{% url 'typeview' aircrafttype.id %}">All Aircraft Systems</a></li>
+		{% if perms.multimediadb.add_systemgraphic %}
         <li><a href="{% url 'graphicadd' aircrafttype.id system.id %}">New Graphic</a></li>
-        <li><a href="{% url 'commentadd' aircrafttype.id system.id 0 0 'system' 'system' %}">New Comment</a></li>
+        {% endif %}
+        {% if perms.multimediadb.add_upload %}
         <li><a href="{% url 'uploadadd' aircrafttype.id system.id 0 'system' %}">New Attachment</a></li>
-		<li><a href='#'>Logout</a></li>
+        {% endif %}
+        {% if perms.multimediadb.add_comment %}
+        <li><a href="{% url 'commentadd' aircrafttype.id system.id 0 0 'system' 'system' %}">New Comment</a></li>
+        {% endif %}
+		<li><a href="{% url 'logout' %}">Logout</a></li>
 	</ul>
 </div>
 
@@ -82,7 +88,9 @@
         <td>{% if graphic.on_hold %}<img src='/static/on_hold.png'>{% endif %}&nbsp;</td>
 		<td class="actions">
 			<a href='{% url 'graphicview' aircrafttype.id system.id graphic.id %}'>View</a>
+			{% if perms.multimediadb.change_systemgraphic %}
 			<a href='{% url 'graphicedit' aircrafttype.id system.id graphic.id %}'>Edit</a>
+			{% endif %}
 		</td>
 	</tr>
 	
@@ -111,7 +119,9 @@
         <td>{{ qa.version|stringformat:'02d' }}&nbsp;</td>
 		<td>{% if qa.status = 'Development Completed' %}<img src='/static/not_started.png'>{% else %}<img src='/static/in_progress.png'>{% endif %}&nbsp;</td>
 		<td class="actions">
+		    {% if perms.multimediadb.add_qa %}
 			<a href='{% url 'qaview' aircrafttype.id system.id qa.id %}'>Perform QA</a>
+			{% endif %}
 		</td>
 	</tr>
 
@@ -167,7 +177,9 @@
 		<td>{{ comment.created_by }}&nbsp;</td>
 		<td>{{ comment.created }}&nbsp;</td>
        	<td class="actions">
+           	{% if perms.multimediadb.change_comment %}
 			<a href='#'>Edit</a>
+			{% endif %}
 		</td>
 	</tr>
 	

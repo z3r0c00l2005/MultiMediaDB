@@ -6,12 +6,18 @@
 <div class="actions">
 	<ul>
 		<li><a href="{% url 'systemview' aircrafttype.id system.id %}">All System Graphics</a></li>
+		{% if perms.multimediadb.add_graphicworkdone %}
         <li><a href="{% url 'workadd' aircrafttype.id system.id graphic.id %}">Add Work Done</a></li>
         <li><a href="{% url 'graphichold' aircrafttype.id system.id graphic.id %}">Toggle Hold Status</a></li>
         <li><a href="{% url 'graphicdone' aircrafttype.id system.id graphic.id %}">Mark Completed</a></li>
+        {% endif %}
+   	    {% if perms.multimediadb.add_comment %}
         <li><a href="{% url 'commentadd' aircrafttype.id system.id graphic.id graphic.version 'graphic' 'Development' %}">New Comment</a></li>
+        {% endif %}
+        {% if perms.multimediadb.add_upload %}
         <li><a href="{% url 'uploadadd' aircrafttype.id system.id graphic.id 'graphic' %}">New Attachment</a></li>
-		<li><a href='#'>Logout</a></li>
+        {% endif %}
+		<li><a href="{% url 'logout' %}">Logout</a></li>
 	</ul>
 </div>
 
@@ -84,8 +90,10 @@
     <td>{{ work.modified }}&nbsp;</td>
     <td>{{ work.modified_by }}&nbsp;</td>
     <td class="actions">
-  	<a href='{% url 'workedit' aircrafttype.id system.id graphic.id work.id %}'>Edit</a>
-		</td>
+        {% if perms.multimediadb.change_graphicworkdone %}
+      	<a href='{% url 'workedit' aircrafttype.id system.id graphic.id work.id %}'>Edit</a>
+      	{% endif %}
+	</td>
 	</tr>
 {% empty %}
 
@@ -117,7 +125,9 @@
 		<td>{{ comment.created_by }}&nbsp;</td>
 		<td>{{ comment.created }}&nbsp;</td>
        	<td class="actions">
+       	    {% if perms.multimediadb.change_comment %}
 			<a href='#'>Edit</a>
+			{% endif %}
 		</td>
 	</tr>
 	
