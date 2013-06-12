@@ -84,7 +84,7 @@
 	</tr>
     {% endif %}
 	<tr>
-		<td>{{ work.work_carried_out }}&nbsp;</td>
+		<td>{{ work.work_carried_out|linebreaksbr }}&nbsp;</td>
 		<td>{{ work.created_by }}&nbsp;</td>
 		<td>{{ work.hours_expended }}&nbsp;</td>
     <td>{{ work.modified }}&nbsp;</td>
@@ -121,7 +121,7 @@
 	<tr>
 	    <td>{{ comment.comment_type }}&nbsp;</td>
 	    <td>{{ comment.comment_version|stringformat:'02d' }}&nbsp;</td>
-		<td>{{ comment.comment }}&nbsp;</td>
+		<td>{{ comment.comment|linebreaksbr }}&nbsp;</td>
 		<td>{{ comment.created_by }}&nbsp;</td>
 		<td>{{ comment.created }}&nbsp;</td>
        	<td class="actions">

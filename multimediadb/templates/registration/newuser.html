@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+
+{% block title %}New User{% endblock %}
+{% block header %}New User{% endblock %}
+{% block content %}
+<div class="aircrafttypes form">
+	<h2>New User</h2>
+	
+	{% if form.errors %}
+        <p style="color: red;">
+            Please correct the error{{ form.errors|pluralize }} below.
+        </p>
+    {% endif %}
+
+   <form action="" method="post">
+     {% csrf_token %}
+        <div class="field">
+            {{ form.username.errors }}
+            <label for="username">Username:</label>
+            {{ form.username }}
+        </div>
+        <div class="field">
+            {{ form.first_name.errors }}
+            <label for="first_name">First Name:</label>
+            {{ form.first_name }}
+        </div>
+        <div class="field">
+            {{ form.last_name.errors }}
+            <label for="last_name">Last Name:</label>
+            {{ form.last_name }}
+        </div>
+        <div class="field">
+            {{ form.groups.errors }}
+            <label for="groups">Group:</label>
+            {{ form.groups }}
+        </div>
+        <div class="field">
+            {{ form.password.errors }}
+            <label for="password">Password:</label>
+            {{ form.password }}
+        </div>        
+        <div class="field">
+            {{ form.check_password.errors }}
+            <label for="check_password">Confirm Password:</label>
+            {{ form.check_password }}
+        </div>                
+        
+        <div class="submit">
+        <input type="submit" name="submit" value="Submit">
+        <input type="submit" name="cancel" value="Cancel">
+    </div>
+    </form>
+</div>
+{% endblock %}

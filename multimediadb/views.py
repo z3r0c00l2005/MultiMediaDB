@@ -7,10 +7,10 @@ from django.contrib import messages
 from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
 from filetransfers.api import prepare_upload, serve_file
-
+from django.contrib.auth.models import User
 import datetime
 from multimediadb.models import Aircrafttype, Aircraftsystem, Systemgraphic, Graphicworkdone, Comments, Uploads, QA
-from multimediadb.forms import TypeAddForm, SystemAddForm, SystemEditForm, GraphicAddForm, GraphicEditForm, WorkAddForm, WorkEditForm, CommentAddForm, CommentEditForm, UploadForm
+from multimediadb.forms import TypeAddForm, SystemAddForm, SystemEditForm, GraphicAddForm, GraphicEditForm, WorkAddForm, WorkEditForm, CommentAddForm, CommentEditForm, UploadForm, NewLoginForm
 
 # ################
 # Type Views     #
@@ -152,6 +152,8 @@ def graphicdone(request, type_id, system_id, graphic_id):
     system = Aircraftsystem.objects.get(pk=system_id)
     graphic = Systemgraphic.objects.get(pk=graphic_id)
     Systemgraphic.objects.filter(id=graphic_id).update(status='Development Completed',)
+    query = Comments(source='graphic', source_id=graphic_id, comment='*** DEVELOPMENT COMPLETE ***', created_by=request.user.get_full_name(), comment_type='Notification', comment_version=graphic.version,)
+    query.save()
     works = Graphicworkdone.objects.filter(systemgraphic_id=graphic_id)
     return redirect('systemview', type_id=type.id, system_id=system.id,)
 
@@ -162,8 +164,12 @@ def graphicholdtoggle(request, type_id, system_id, graphic_id):
     graphic = Systemgraphic.objects.get(pk=graphic_id)
     if graphic.on_hold:
         Systemgraphic.objects.filter(id=graphic_id).update(on_hold=0,)
+        query = Comments(source='graphic', source_id=graphic_id, comment='*** TAKEN OFF HOLD ***', created_by=request.user.get_full_name(), comment_type='Notification', comment_version=graphic.version,)
+        query.save()
     else:
         Systemgraphic.objects.filter(id=graphic_id).update(on_hold=1,)
+        query = Comments(source='graphic', source_id=graphic_id, comment='*** PLACED ON HOLD ***', created_by=request.user.get_full_name(), comment_type='Notification', comment_version=graphic.version,)
+        query.save()
     works = Graphicworkdone.objects.filter(systemgraphic_id=graphic_id)
     return redirect('systemview', type_id=type.id, system_id=system.id,)
 
@@ -381,6 +387,8 @@ def qaresult(request, type_id, system_id, graphic_id, graphic_version, stage, qa
     else:
         QA.objects.filter(pk=qa_id).update(result=result, created_by=request.user.get_full_name())
         Systemgraphic.objects.filter(id=graphic_id).update(status='In Progress',)
+        query = Comments(source='graphic', source_id=graphic_id, comment='*** QA FAIL ***', created_by=request.user.get_full_name(), comment_type='Notification', comment_version=graphic.version,)
+        query.save()
         return redirect('systemview', type_id=type.id, system_id=system.id)
     
     return redirect('qaview', type_id=type.id, system_id=system.id, graphic_id=graphic.id)
@@ -395,11 +403,20 @@ def logout_view(request):
     logout(request)    
     return redirect('login')
     
-    
-    
-    
-    
-    
-    
-    
-    
+@login_required
+def create_login(request):
+    if 'cancel' in request.POST:
+            return HttpResponseRedirect(reverse('home'))    
+    if request.method == 'POST':
+        form = NewLoginForm(request.POST)
+        if form.is_valid():
+            cd = form.cleaned_data
+            lNewUser = User.objects.create_user(cd['username'], 'anemail', cd['password'])
+            lNewUser.first_name = cd['first_name']
+            lNewUser.last_name = cd['last_name']
+            lNewUser.groups.add(cd['groups'])
+            lNewUser.save()
+            return HttpResponseRedirect(reverse('home'))
+    else:
+        form = NewLoginForm()
+    return render(request, 'registration/newuser.html', {'form': form})

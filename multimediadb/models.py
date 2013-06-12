@@ -47,7 +47,7 @@ class Systemgraphic(models.Model):
         
 class Graphicworkdone(models.Model):
     systemgraphic = models.ForeignKey(Systemgraphic)
-    work_carried_out = models.CharField(max_length=255)
+    work_carried_out = models.TextField()
     hours_expended = models.DecimalField(max_digits=5, decimal_places=2)
     created_by = models.CharField(max_length=50)
     modified_by = models.CharField(max_length=50)

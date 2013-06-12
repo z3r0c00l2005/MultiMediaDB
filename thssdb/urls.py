@@ -16,6 +16,7 @@ urlpatterns = patterns('',
     url(r'^admin/', include(admin.site.urls)),
 	url(r'^accounts/login/$',  login, name='login'),
     url(r'^accounts/logout/$', views.logout_view, name='logout'),
+	url(r'^accounts/new/$',  views.create_login, name='newuser'),
     
     url(r'^types/$', views.typeindex, name='typeindex'),
     url(r'^types/add$', views.typeadd, name='typeadd'),
