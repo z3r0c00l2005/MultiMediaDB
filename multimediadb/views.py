@@ -10,7 +10,7 @@ from filetransfers.api import prepare_upload, serve_file
 from django.contrib.auth.models import User
 import datetime
 from multimediadb.models import Aircrafttype, Aircraftsystem, Systemgraphic, Graphicworkdone, Comments, Uploads, QA
-from multimediadb.forms import TypeAddForm, SystemAddForm, SystemEditForm, GraphicAddForm, GraphicEditForm, WorkAddForm, WorkEditForm, CommentAddForm, CommentEditForm, UploadForm, NewLoginForm, PasswordChange
+from multimediadb.forms import TypeAddForm, SystemAddForm, SystemEditForm, GraphicAddForm, GraphicEditForm, WorkAddForm, WorkEditForm, CommentAddForm, CommentEditForm, UploadForm, NewLoginForm, PasswordChange, UserEdit
 
 # ################
 # Type Views     #
@@ -406,35 +406,65 @@ def logout_view(request):
 @login_required
 def create_login(request):
     if 'cancel' in request.POST:
-            return HttpResponseRedirect(reverse('home'))    
+            return HttpResponseRedirect(reverse('allusers'))    
     if request.method == 'POST':
         form = NewLoginForm(request.POST)
         if form.is_valid():
             cd = form.cleaned_data
-            lNewUser = User.objects.create_user(cd['username'], 'anemail', cd['password'])
+            lNewUser = User.objects.create_user(cd['username'], 'dummy@email.com', cd['password'])
             lNewUser.first_name = cd['first_name']
             lNewUser.last_name = cd['last_name']
             lNewUser.groups.add(cd['groups'])
             lNewUser.save()
-            return HttpResponseRedirect(reverse('home'))
+            return HttpResponseRedirect(reverse('allusers'))
     else:
         form = NewLoginForm()
     return render(request, 'registration/newuser.html', {'form': form})
     
 @login_required
-def change_password(request):
+def change_password(request, user_id, source):
     if 'cancel' in request.POST:
-            return HttpResponseRedirect(reverse('home'))    
+        if source == 'usermanager':
+            return HttpResponseRedirect(reverse('allusers'))
+        return HttpResponseRedirect(reverse('home'))     
     if request.method == 'POST':
         form = PasswordChange(request.POST)
         if form.is_valid():
             cd = form.cleaned_data
            
-            u = User.objects.get(username__exact=request.user.username)
+            u = User.objects.get(pk = user_id)
             u.set_password(cd['password'])
             u.save()
-            
+            if source == 'usermanager':
+                return HttpResponseRedirect(reverse('allusers'))
             return HttpResponseRedirect(reverse('home'))
     else:
         form = PasswordChange()
     return render(request, 'registration/passwordchange.html', {'form': form})
+    
+@login_required
+def userindex(request):
+    listofusers = User.objects.all()
+    return render(request, 'registration/index.html', {'listofusers': listofusers})
+    
+    
+@login_required    
+def edit_user(request, user_id):
+    if 'cancel' in request.POST:
+            return HttpResponseRedirect(reverse('allusers'))    
+    if request.method == 'POST':
+        form = UserEdit(request.POST)
+        if form.is_valid():
+            cd = form.cleaned_data
+            User.objects.filter(id=user_id).update(username = cd['username'], first_name=cd['first_name'], last_name=cd['last_name'],)
+            lUser = User.objects.get(id=user_id)
+            lUser.groups.clear()
+            lUser.groups.add(cd['groups'])
+            lUser.save()
+            return HttpResponseRedirect(reverse('allusers'))
+    else:
+        lUser = User.objects.get(id=user_id)
+        dictionary = model_to_dict(lUser, fields=[], exclude=[])
+        form = UserEdit(initial=dictionary)
+    return render(request, 'registration/useredit.html', {'form': form})
+ 

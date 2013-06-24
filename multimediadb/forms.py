@@ -87,3 +87,19 @@ class PasswordChange(forms.Form):
             # are required by default so we don't need to worry about validation
             pass
         return self.cleaned_data
+        
+        
+class UserEdit(forms.Form):
+    username = forms.CharField()
+    first_name = forms.CharField()
+    last_name = forms.CharField()
+    groups = forms.ModelChoiceField(Group.objects.all())
+    
+    def __init__(self, *args, **kwargs):
+        groupinfo = kwargs.pop('initial', None)
+        super(UserEdit, self).__init__(*args, **kwargs)
+        if groupinfo:
+            self.fields['username'].initial = groupinfo['username']
+            self.fields['first_name'].initial = groupinfo['first_name']
+            self.fields['last_name'].initial = groupinfo['last_name']
+            self.fields['groups'].initial = int(groupinfo['groups'][0])

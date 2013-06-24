@@ -17,8 +17,10 @@ urlpatterns = patterns('',
 	url(r'^accounts/login/$',  login, name='login'),
     url(r'^accounts/logout/$', views.logout_view, name='logout'),
 	url(r'^accounts/new/$',  views.create_login, name='newuser'),
-	url(r'^accounts/newpass/$',  views.change_password, name='changepassword'),
-    
+	url(r'^accounts/newpass/(?P<user_id>\d+)/(?P<source>\w+)/',  views.change_password, name='changepassword'),
+	url(r'^accounts/all/$',  views.userindex, name='allusers'),
+	url(r'^accounts/edit/(?P<user_id>\d+)/',  views.edit_user, name='edituser'),
+	    
     url(r'^types/$', views.typeindex, name='typeindex'),
     url(r'^types/add$', views.typeadd, name='typeadd'),
     url(r'^types/(?P<type_id>\d+)/', views.typeview, name='typeview'),

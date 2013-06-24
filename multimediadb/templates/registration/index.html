@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% block title %}Users{% endblock %}
+{% block header %}Users{% endblock %}
+{% block content %}
+<div class="actions">
+	<ul>
+	{% if perms.multimediadb.add_aircrafttype %}
+		<li><a href='{% url 'home' %}'>Home</a></li>
+	{% endif %}
+	{% if perms.auth.add_user %}
+		<li><a href="{% url 'newuser' %}">New User</a></li>
+	{% endif %}	
+		<li><a href="{% url 'logout' %}">Logout</a></li>
+	</ul>
+</div>
+<div class="aircrafttypes index">
+	<h2>All Users</h2>
+	<table cellpadding="0" cellspacing="0">
+	
+{% for user in listofusers %}
+    {% if forloop.first %}    
+    <tr>
+			<th>User Name</th>
+			<th>First Name</th>
+			<th>Last Name</th>
+			<th>User Group</th>
+			<th class="actions">Actions</th>
+	</tr>
+    {% endif %}
+	<tr>
+		<td>{{ user.username }}&nbsp;</td>
+		<td>{{ user.first_name }}&nbsp;</td>
+		<td>{{ user.last_name }}&nbsp;</td>
+		<td>{{ user.groups.all.0 }}&nbsp;</td>
+		<td class="actions">
+			<a href="{% url 'edituser' user.id%}">Edit</a>
+			<a href="{% url 'changepassword' user.id 'usermanager' %}">New Password</a>
+		</td>
+	</tr>
+{% empty %}
+
+{% endfor %}
+	</table>
+</div>
+
+
+{% endblock %}

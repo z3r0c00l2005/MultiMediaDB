@@ -3,12 +3,12 @@
 <link rel="stylesheet" type="text/css" href="{% static 'main.css' %}" />
 <html>
 <head>
-	<title>{% block title %}{% endblock %}</title>
+	<title>THSS Multimedia Database - {% block title %}{% endblock %}</title>
 </head>
 <body>
 	<div id="container">
 		<div id="header">
-			<h1>{% block header %}{% endblock %}</h1>
+	       	<h1>THSS Multimedia Database - {% block header %}{% endblock %} {% if user.is_authenticated %} - {{ user.get_full_name }}{% endif %}</h1>
 		</div>
 		<div id="content">
 		{% if messages %}
