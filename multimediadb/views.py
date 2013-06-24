@@ -10,7 +10,7 @@ from filetransfers.api import prepare_upload, serve_file
 from django.contrib.auth.models import User
 import datetime
 from multimediadb.models import Aircrafttype, Aircraftsystem, Systemgraphic, Graphicworkdone, Comments, Uploads, QA
-from multimediadb.forms import TypeAddForm, SystemAddForm, SystemEditForm, GraphicAddForm, GraphicEditForm, WorkAddForm, WorkEditForm, CommentAddForm, CommentEditForm, UploadForm, NewLoginForm
+from multimediadb.forms import TypeAddForm, SystemAddForm, SystemEditForm, GraphicAddForm, GraphicEditForm, WorkAddForm, WorkEditForm, CommentAddForm, CommentEditForm, UploadForm, NewLoginForm, PasswordChange
 
 # ################
 # Type Views     #
@@ -420,3 +420,21 @@ def create_login(request):
     else:
         form = NewLoginForm()
     return render(request, 'registration/newuser.html', {'form': form})
+    
+@login_required
+def change_password(request):
+    if 'cancel' in request.POST:
+            return HttpResponseRedirect(reverse('home'))    
+    if request.method == 'POST':
+        form = PasswordChange(request.POST)
+        if form.is_valid():
+            cd = form.cleaned_data
+           
+            u = User.objects.get(username__exact=request.user.username)
+            u.set_password(cd['password'])
+            u.save()
+            
+            return HttpResponseRedirect(reverse('home'))
+    else:
+        form = PasswordChange()
+    return render(request, 'registration/passwordchange.html', {'form': form})
