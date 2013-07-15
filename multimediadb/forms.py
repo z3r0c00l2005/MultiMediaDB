@@ -25,14 +25,14 @@ class SystemEditForm(forms.Form):
     
 class GraphicAddForm(forms.Form):
     media_label = forms.CharField(max_length=100)
-    title = forms.CharField(max_length=50)
-    description = forms.CharField(max_length=50)
+    title = forms.CharField(max_length=255)
+    description = forms.CharField(widget = forms.Textarea)
     estimated_hours = forms.DecimalField(max_digits=5, decimal_places=2)
 
 class GraphicEditForm(forms.Form):
     media_label = forms.CharField(max_length=100)
-    title = forms.CharField(max_length=50)
-    description = forms.CharField(max_length=50)
+    title = forms.CharField(max_length=255)
+    description = forms.CharField(widget = forms.Textarea)
     adjusted_hours = forms.DecimalField(max_digits=5, decimal_places=2)
 
 class WorkAddForm(forms.Form):

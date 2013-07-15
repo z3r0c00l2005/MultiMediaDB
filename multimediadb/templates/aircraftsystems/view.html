@@ -80,7 +80,7 @@
 	<tr>
 		<td>{{ graphic.media_label }}&nbsp;</td>
 		<td>{{ graphic.title }}&nbsp;</td>
-		<td>{{ graphic.description }}&nbsp;</td>
+		<td>{{ graphic.description|linebreaksbr }}&nbsp;</td>
         <td>{{ graphic.version|stringformat:'02d' }}&nbsp;</td>
         <td>{{ graphic.estimated_hours }}&nbsp;</td>
         <td>{{ graphic.adjusted_hours }}&nbsp;</td>
@@ -115,7 +115,7 @@
 	<tr>
 		<td>{{ qa.media_label }}&nbsp;</td>
 		<td>{{ qa.title }}&nbsp;</td>
-		<td>{{ qa.description }}&nbsp;</td>
+		<td>{{ qa.description|linebreaksbr }}&nbsp;</td>
         <td>{{ qa.version|stringformat:'02d' }}&nbsp;</td>
 		<td>{% if qa.status = 'Development Completed' %}<img src='/static/not_started.png'>{% else %}<img src='/static/in_progress.png'>{% endif %}&nbsp;</td>
 		<td class="actions">
@@ -145,7 +145,7 @@
 	<tr>
 		<td>{{ complete.media_label }}&nbsp;</td>
 		<td>{{ complete.title }}&nbsp;</td>
-		<td>{{ complete.description }}&nbsp;</td>
+		<td>{{ complete.description|linebreaksbr }}&nbsp;</td>
         <td>{{ complete.version|stringformat:'02d' }}&nbsp;</td>
 		<td class="actions">
 			<a href='{% url 'graphicview' aircrafttype.id system.id complete.id %}'>View</a>
