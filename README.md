@@ -1,5 +1,5 @@
-thssdjango
-==========
+MultiMediaDB
+============
 
 Django version of THSS MM DB
 
@@ -38,5 +38,5 @@ Notes
 The version of mod_wsgi is dependent on the architecture and version of Apache used.
 The version of MySQL-python is dependent on the version of python used.
 Django 1.5.1 needs python 2.7.
-Source is stored under git version control - https://github.com/z3r0c00l2005/thssdjango
+Source is stored under git version control - https://github.com/z3r0c00l2005/MultiMediaDB
 
