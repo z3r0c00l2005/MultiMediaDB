@@ -8,7 +8,7 @@
 <body>
 	<div id="container">
 		<div id="header">
-	       	<h1>THSS Multimedia Database - {% block header %}{% endblock %} {% if user.is_authenticated %} - {{ user.get_full_name }}{% endif %}</h1>
+	       	<a href="{% url 'typeindex' %}"><h1>THSS Multimedia Database - {% block header %}{% endblock %} {% if user.is_authenticated %} - {{ user.get_full_name }}{% endif %}</h1></a>
 		</div>
 		<div id="content">
 		{% if messages %}

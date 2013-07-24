@@ -5,6 +5,10 @@ class TypeAddForm(forms.Form):
     name = forms.CharField(max_length=30)
     description = forms.CharField(max_length=50)
     
+class TypeEditForm(forms.Form):
+    name = forms.CharField(max_length=30)
+    description = forms.CharField(max_length=50)
+    
 class SystemAddForm(forms.Form):
     WORKSHARE_CHOICES = (
         ('UK', 'UK'),

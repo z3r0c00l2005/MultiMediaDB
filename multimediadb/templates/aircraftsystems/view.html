@@ -66,11 +66,10 @@
         <td><h4>In Development</h4></td>
     </tr>
     <tr>
-			<th>Media Label</th>
+			<th>Media Label<BR><BR>Last Update By</th>
 			<th>Title</th>
     		<th>Description</th>
             <th>Version</th>
-            <th>Estimated Hours</th>
             <th>Adjusted Hours</th>
     		<th>Status</th>
             <th>On Hold</th>
@@ -78,11 +77,10 @@
 	</tr>
     {% endif %}
 	<tr>
-		<td>{{ graphic.media_label }}&nbsp;</td>
+		<td nowrap="nowrap">{{ graphic.media_label }}<br><br>{{ graphic.last_update_by }}&nbsp;</td>
 		<td>{{ graphic.title }}&nbsp;</td>
 		<td>{{ graphic.description|linebreaksbr }}&nbsp;</td>
         <td>{{ graphic.version|stringformat:'02d' }}&nbsp;</td>
-        <td>{{ graphic.estimated_hours }}&nbsp;</td>
         <td>{{ graphic.adjusted_hours }}&nbsp;</td>
 		<td>{% if graphic.status = 'Not Started' %}<img src='/static/not_started.png'>{% else %}<img src='/static/in_progress.png'>{% endif %}&nbsp;</td>
         <td>{% if graphic.on_hold %}<img src='/static/on_hold.png'>{% endif %}&nbsp;</td>

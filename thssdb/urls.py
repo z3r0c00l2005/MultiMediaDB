@@ -23,6 +23,7 @@ urlpatterns = patterns('',
 	    
     url(r'^types/$', views.typeindex, name='typeindex'),
     url(r'^types/add$', views.typeadd, name='typeadd'),
+    url(r'^types/edit/(?P<type_id>\d+)/', views.typeedit, name='typeedit'),
     url(r'^types/(?P<type_id>\d+)/', views.typeview, name='typeview'),
 	
 	url(r'^systems/add/(?P<type_id>\d+)/', views.systemadd, name='systemadd'),

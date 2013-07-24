@@ -10,7 +10,7 @@ from filetransfers.api import prepare_upload, serve_file
 from django.contrib.auth.models import User
 import datetime
 from multimediadb.models import Aircrafttype, Aircraftsystem, Systemgraphic, Graphicworkdone, Comments, Uploads, QA
-from multimediadb.forms import TypeAddForm, SystemAddForm, SystemEditForm, GraphicAddForm, GraphicEditForm, WorkAddForm, WorkEditForm, CommentAddForm, CommentEditForm, UploadForm, NewLoginForm, PasswordChange, UserEdit
+from multimediadb.forms import TypeAddForm, TypeEditForm, SystemAddForm, SystemEditForm, GraphicAddForm, GraphicEditForm, WorkAddForm, WorkEditForm, CommentAddForm, CommentEditForm, UploadForm, NewLoginForm, PasswordChange, UserEdit
 
 # ################
 # Type Views     #
@@ -40,6 +40,23 @@ def typeadd(request):
     else:
         form = TypeAddForm()
     return render(request, 'aircrafttypes/add.html', {'form': form})
+
+@login_required
+def typeedit(request, type_id):
+    if 'cancel' in request.POST:
+            return HttpResponseRedirect(reverse('typeindex'))   
+    if request.method == 'POST':
+        form = TypeEditForm(request.POST)
+        if form.is_valid():
+            cd = form.cleaned_data
+            Aircrafttype.objects.filter(id=type_id).update(name=cd['name'], description=cd['description'],)
+            return HttpResponseRedirect(reverse('typeindex'))
+    else:
+        type = Aircrafttype.objects.get(id=type_id)
+        dictionary = model_to_dict(type, fields=[], exclude=[])
+        form = TypeEditForm(initial=dictionary)
+    return render(request, 'aircrafttypes/edit.html', {'form': form})
+
 
 # ################
 # System Views   #
@@ -190,6 +207,7 @@ def workadd(request, type_id, system_id, graphic_id):
             graphic = Systemgraphic.objects.get(id=graphic_id)
             query = Graphicworkdone(systemgraphic=graphic, work_carried_out=cd['work_carried_out'], created_by=request.user.get_full_name(), hours_expended=cd['hours_expended'],)
             query.save()
+            Systemgraphic.objects.filter(id=graphic_id).update(last_update_by=request.user.get_full_name(),)
             Systemgraphic.objects.filter(id=graphic_id).update(status='In Progress',)
             return HttpResponseRedirect(reverse('graphicview', args=(type_id, system_id, graphic_id)))    
     else:

@@ -41,6 +41,7 @@ class Systemgraphic(models.Model):
     adjusted_hours = models.DecimalField(max_digits=5, decimal_places=2)
     status = models.CharField(max_length=25, choices=GRAPHIC_STATUS_CHOICES, default='Not Started')
     on_hold = models.BooleanField(default=False)
+    last_update_by = models.CharField(max_length=50)
     
     def __unicode__(self):
         return u'%s - %s' % (self.title, self.description)
