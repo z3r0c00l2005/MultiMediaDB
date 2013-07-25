@@ -11,6 +11,10 @@ from django.contrib.auth.models import User
 import datetime
 from multimediadb.models import Aircrafttype, Aircraftsystem, Systemgraphic, Graphicworkdone, Comments, Uploads, QA
 from multimediadb.forms import TypeAddForm, TypeEditForm, SystemAddForm, SystemEditForm, GraphicAddForm, GraphicEditForm, WorkAddForm, WorkEditForm, CommentAddForm, CommentEditForm, UploadForm, NewLoginForm, PasswordChange, UserEdit
+from reportlab.pdfgen import canvas
+
+from geraldo.generators import PDFGenerator
+from reports import TypesReport, SystemReport
 
 # ################
 # Type Views     #
@@ -23,7 +27,7 @@ def typeindex(request):
 @login_required    
 def typeview(request, type_id):
     type = Aircrafttype.objects.get(pk=type_id)
-    systems = Aircraftsystem.objects.filter(aircrafttype_id=type_id)
+    systems = Aircraftsystem.objects.filter(aircrafttype_id=type_id).order_by('-workshare', 'name')
     return render(request, 'aircrafttypes/view.html', {'aircrafttype': type, 'systems': systems})
 
 @login_required
@@ -100,11 +104,11 @@ def systemview(request, type_id, system_id):
     type = Aircrafttype.objects.get(pk=type_id)
     system = Aircraftsystem.objects.get(pk=system_id)
     # Tables of graphics
-    allgraphics = Systemgraphic.objects.filter(aircraftsystem_id=system_id)
-    holdgraphics = Systemgraphic.objects.filter(aircraftsystem_id=system_id).filter(status__in=['Not Started','In Progress']).filter(on_hold=1)
-    graphics = Systemgraphic.objects.filter(aircraftsystem_id=system_id).filter(status__in=['Not Started','In Progress'])
-    inqa = Systemgraphic.objects.filter(aircraftsystem_id=system_id, status__in=['Development Completed','TechnicalReview','EditorialReview','InternalQA','UploadedToLCMS','ExternalReview'])
-    complete = Systemgraphic.objects.filter(aircraftsystem_id=system_id).filter(status__in=['Locked'])
+    allgraphics = Systemgraphic.objects.filter(aircraftsystem_id=system_id).order_by('media_label', 'version')
+    holdgraphics = Systemgraphic.objects.filter(aircraftsystem_id=system_id).filter(status__in=['Not Started','In Progress']).filter(on_hold=1).order_by('media_label', 'version')
+    graphics = Systemgraphic.objects.filter(aircraftsystem_id=system_id).filter(status__in=['Not Started','In Progress']).order_by('media_label', 'version')
+    inqa = Systemgraphic.objects.filter(aircraftsystem_id=system_id, status__in=['Development Completed','TechnicalReview','EditorialReview','InternalQA','UploadedToLCMS','ExternalReview']).order_by('media_label', 'version')
+    complete = Systemgraphic.objects.filter(aircraftsystem_id=system_id).filter(status__in=['Locked']).order_by('media_label', 'version')
     # Header Calculations
     adjest = Systemgraphic.objects.filter(aircraftsystem_id=system_id).aggregate(adjustedestimate=Sum('adjusted_hours'))
     est = Systemgraphic.objects.filter(aircraftsystem_id=system_id).aggregate(estimate=Sum('estimated_hours'))
@@ -486,3 +490,28 @@ def edit_user(request, user_id):
         form = UserEdit(initial=dictionary)
     return render(request, 'registration/useredit.html', {'form': form})
  
+ 
+ 
+ 
+# ################
+# Report Views   #
+# ################      
+    
+def typereport(request):
+    resp = HttpResponse(mimetype='application/pdf')
+
+    types = Aircrafttype.objects.all()
+    report = TypesReport(queryset=types)
+    report.generate_by(PDFGenerator, filename=resp)
+
+    return resp
+    
+def systemreport(request, type_id):
+    resp = HttpResponse(mimetype='application/pdf')
+
+    type = Aircrafttype.objects.get(pk=type_id)
+    systems = Aircraftsystem.objects.filter(aircrafttype_id=type_id)
+    report = SystemReport(queryset=systems)
+    report.generate_by(PDFGenerator, filename=resp, variables={'actype': type.name})
+
+    return resp

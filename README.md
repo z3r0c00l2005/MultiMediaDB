@@ -40,3 +40,10 @@ The version of MySQL-python is dependent on the version of python used.
 Django 1.5.1 needs python 2.7.
 Source is stored under git version control - https://github.com/z3r0c00l2005/MultiMediaDB
 
+
+FUTURE
+------
+
+Need ReportLab
+Need PIL
+Need Geraldo
