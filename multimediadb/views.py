@@ -28,6 +28,24 @@ def typeindex(request):
 def typeview(request, type_id):
     type = Aircrafttype.objects.get(pk=type_id)
     systems = Aircraftsystem.objects.filter(aircrafttype_id=type_id).order_by('-workshare', 'name')
+
+    for system in systems:
+        system.total = Systemgraphic.objects.filter(aircraftsystem_id=system.id).count()
+        system.notdone = Systemgraphic.objects.filter(aircraftsystem_id=system.id).filter(status__in=['Not Started']).filter(on_hold=0).count()
+        system.work = Systemgraphic.objects.filter(aircraftsystem_id=system.id).filter(status__in=['In Progress']).filter(on_hold=0).count()
+        system.hold = Systemgraphic.objects.filter(aircraftsystem_id=system.id).filter(status__in=['Not Started','In Progress']).filter(on_hold=1).count()
+        system.qa = Systemgraphic.objects.filter(aircraftsystem_id=system.id, status__in=['Development Completed','TechnicalReview','EditorialReview','InternalQA','UploadedToLCMS','ExternalReview']).count()
+        system.complete = Systemgraphic.objects.filter(aircraftsystem_id=system.id).filter(status__in=['Locked']).count()
+
+        if system.total!=0:
+            onepc = 100.0/system.total
+            system.notdonepc = system.notdone*onepc
+            system.workpc = system.work*onepc
+            system.holdpc = system.hold * onepc
+            system.qapc = system.qa * onepc
+            system.completepc = system.complete * onepc
+  
+    # assert false, locals()
     return render(request, 'aircrafttypes/view.html', {'aircrafttype': type, 'systems': systems})
 
 @login_required
@@ -107,6 +125,7 @@ def systemview(request, type_id, system_id):
     allgraphics = Systemgraphic.objects.filter(aircraftsystem_id=system_id).order_by('media_label', 'version')
     holdgraphics = Systemgraphic.objects.filter(aircraftsystem_id=system_id).filter(status__in=['Not Started','In Progress']).filter(on_hold=1).order_by('media_label', 'version')
     graphics = Systemgraphic.objects.filter(aircraftsystem_id=system_id).filter(status__in=['Not Started','In Progress']).order_by('media_label', 'version')
+    inprogress = Systemgraphic.objects.filter(aircraftsystem_id=system_id).filter(status__in=['In Progress']).order_by('media_label', 'version')
     inqa = Systemgraphic.objects.filter(aircraftsystem_id=system_id, status__in=['Development Completed','TechnicalReview','EditorialReview','InternalQA','UploadedToLCMS','ExternalReview']).order_by('media_label', 'version')
     complete = Systemgraphic.objects.filter(aircraftsystem_id=system_id).filter(status__in=['Locked']).order_by('media_label', 'version')
     # Header Calculations
@@ -116,7 +135,7 @@ def systemview(request, type_id, system_id):
     # Tables of comments
     comments = Comments.objects.filter(source='system', source_id=system_id,)
     uploads = Uploads.objects.filter(source='system', source_id=system_id,)
-    return render(request, 'aircraftsystems/view.html', {'aircrafttype': type, 'system': system, 'allgraphics': allgraphics, 'graphics': graphics, 'holdgraphics': holdgraphics, 'inqa': inqa, 'completed': complete, 'adjest': adjest, 'est': est, 'booked': booked, 'comments': comments, 'uploads': uploads,})
+    return render(request, 'aircraftsystems/view.html', {'aircrafttype': type, 'system': system, 'allgraphics': allgraphics, 'inprogress': inprogress, 'graphics': graphics, 'holdgraphics': holdgraphics, 'inqa': inqa, 'completed': complete, 'adjest': adjest, 'est': est, 'booked': booked, 'comments': comments, 'uploads': uploads,})
     
 # ################
 # Graphic Views  #

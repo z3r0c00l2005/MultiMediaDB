@@ -21,6 +21,7 @@ class Aircraftsystem(models.Model):
     def __unicode__(self):
         return u'%s - %s' % (self.name, self.description)
 
+
 class Systemgraphic(models.Model):
     GRAPHIC_STATUS_CHOICES = (
         ('Not Started', 'Not Started'),
