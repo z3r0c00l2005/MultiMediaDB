@@ -11,10 +11,10 @@ from django.contrib.auth.models import User
 import datetime
 from multimediadb.models import Aircrafttype, Aircraftsystem, Systemgraphic, Graphicworkdone, Comments, Uploads, QA
 from multimediadb.forms import TypeAddForm, TypeEditForm, SystemAddForm, SystemEditForm, GraphicAddForm, GraphicEditForm, WorkAddForm, WorkEditForm, CommentAddForm, CommentEditForm, UploadForm, NewLoginForm, PasswordChange, UserEdit
-from reportlab.pdfgen import canvas
+#from reportlab.pdfgen import canvas
 
-from geraldo.generators import PDFGenerator
-from reports import TypesReport, SystemReport
+#from geraldo.generators import PDFGenerator
+#from reports import TypesReport, SystemReport
 
 # ################
 # Type Views     #
@@ -516,21 +516,21 @@ def edit_user(request, user_id):
 # Report Views   #
 # ################      
     
-def typereport(request):
-    resp = HttpResponse(mimetype='application/pdf')
-
-    types = Aircrafttype.objects.all()
-    report = TypesReport(queryset=types)
-    report.generate_by(PDFGenerator, filename=resp)
-
-    return resp
-    
-def systemreport(request, type_id):
-    resp = HttpResponse(mimetype='application/pdf')
-
-    type = Aircrafttype.objects.get(pk=type_id)
-    systems = Aircraftsystem.objects.filter(aircrafttype_id=type_id)
-    report = SystemReport(queryset=systems)
-    report.generate_by(PDFGenerator, filename=resp, variables={'actype': type.name})
-
-    return resp
+#def typereport(request):
+#    resp = HttpResponse(mimetype='application/pdf')
+#
+#    types = Aircrafttype.objects.all()
+#    report = TypesReport(queryset=types)
+#    report.generate_by(PDFGenerator, filename=resp)
+#
+#    return resp
+#    
+#def systemreport(request, type_id):
+#    resp = HttpResponse(mimetype='application/pdf')
+#
+#    type = Aircrafttype.objects.get(pk=type_id)
+#    systems = Aircraftsystem.objects.filter(aircrafttype_id=type_id)
+#    report = SystemReport(queryset=systems)
+#    report.generate_by(PDFGenerator, filename=resp, variables={'actype': type.name})
+#
+#    return resp
