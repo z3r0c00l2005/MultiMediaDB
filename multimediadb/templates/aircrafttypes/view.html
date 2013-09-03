@@ -44,12 +44,14 @@
 		<td>
 		    <table cellpadding = "0" cellspacing = "0">
 		    <tr style="height:20px">
-		        {% if system.notdone %}
+		        {% if system.total != system.complete and system.total != 0 %}
 		        <td style="text-align:center;padding:0px;background-color:red;width:{{ system.notdonepc }}%">{% if system.notdone %}{{ system.notdone }}{% endif %}</td>
     	        <td style="text-align:center;padding:0px;background-color:yellow;width:{{ system.workpc }}%">{% if system.work %}{{ system.work }}{% endif %}</td>
     	        <td style="color:white;text-align:center;padding:0px;background-color:blue;width:{{ system.holdpc }}%">{% if system.hold %}{{ system.hold }}{% endif %}</td>
 		        <td style="text-align:center;padding:0px;background-color:orange;width:{{ system.qapc }}%">{% if system.qa %}{{ system.qa }}{% endif %}</td>
 		        <td style="color:white;text-align:center;padding:0px;background-color:green;width:{{ system.completepc }}%">{% if system.complete %}{{ system.complete }}{% endif %}</td>
+		        {% elif system.total == system.complete and system.total != 0 %}
+		        <td nowrap="nowrap" style="color:white;text-align:center;padding:0px;background-color:green;width:100%">All Graphics Complete</td>
 		        {% else %}
 		        <td style="text-align:center;padding:0px;background-color:lightgrey;width:100%">No Graphics</td>
                 {% endif %}
