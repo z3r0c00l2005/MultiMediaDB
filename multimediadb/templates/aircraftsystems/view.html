@@ -70,7 +70,9 @@
 			<th>Title</th>
     		<th>Description</th>
             <th>Version</th>
-            <th>Adjusted Hours</th>
+            <th>Adjusted<BR>Hours</th>
+            <th>Booked<BR>Hours</th>
+            <th>Remaining<BR>Hours</th>
     		<th>Status</th>
             <th>On Hold</th>
 			<th class="actions">Actions</th>
@@ -82,6 +84,8 @@
 		<td>{{ graphic.description|linebreaksbr }}&nbsp;</td>
         <td>{{ graphic.version|stringformat:'02d' }}&nbsp;</td>
         <td>{{ graphic.adjusted_hours }}&nbsp;</td>
+        <td>{{ graphic.booked.booked }}&nbsp;</td>
+        <td style="{% if graphic.delta < 0 %} color:red; {% else %} color:green; {% endif %}">{{ graphic.delta }}&nbsp;</td>
 		<td>{% if graphic.status = 'Not Started' %}<img src='/static/not_started.png'>{% else %}<img src='/static/in_progress.png'>{% endif %}&nbsp;</td>
         <td>{% if graphic.on_hold %}<img src='/static/on_hold.png'>{% endif %}&nbsp;</td>
 		<td class="actions">

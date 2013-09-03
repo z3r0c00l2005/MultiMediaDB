@@ -36,7 +36,18 @@ def typeview(request, type_id):
         system.hold = Systemgraphic.objects.filter(aircraftsystem_id=system.id).filter(status__in=['Not Started','In Progress']).filter(on_hold=1).count()
         system.qa = Systemgraphic.objects.filter(aircraftsystem_id=system.id, status__in=['Development Completed','TechnicalReview','EditorialReview','InternalQA','UploadedToLCMS','ExternalReview']).count()
         system.complete = Systemgraphic.objects.filter(aircraftsystem_id=system.id).filter(status__in=['Locked']).count()
-
+        # Hours
+        system.adjest = Systemgraphic.objects.filter(aircraftsystem_id=system.id).aggregate(adjustedestimate=Sum('adjusted_hours'))
+        allgraphics = Systemgraphic.objects.filter(aircraftsystem_id=system.id).order_by('media_label', 'version')
+        system.booked = Graphicworkdone.objects.filter(systemgraphic_id__in=allgraphics).aggregate(booked=Sum('hours_expended'))
+        
+        if system.adjest["adjustedestimate"] is None:
+            system.adjest["adjustedestimate"] = 0
+        
+        if system.booked["booked"] is None:
+            system.booked["booked"] = 0
+        system.delta = system.adjest["adjustedestimate"] - system.booked["booked"]
+        
         if system.total!=0:
             onepc = 100.0/system.total
             system.notdonepc = system.notdone*onepc
@@ -123,11 +134,35 @@ def systemview(request, type_id, system_id):
     system = Aircraftsystem.objects.get(pk=system_id)
     # Tables of graphics
     allgraphics = Systemgraphic.objects.filter(aircraftsystem_id=system_id).order_by('media_label', 'version')
+    for graphic in allgraphics:
+        graphic.booked = Graphicworkdone.objects.filter(systemgraphic_id=graphic.id).aggregate(booked=Sum('hours_expended'))
+    
     holdgraphics = Systemgraphic.objects.filter(aircraftsystem_id=system_id).filter(status__in=['Not Started','In Progress']).filter(on_hold=1).order_by('media_label', 'version')
+    for graphic in holdgraphics:
+        graphic.booked = Graphicworkdone.objects.filter(systemgraphic_id=graphic.id).aggregate(booked=Sum('hours_expended'))
+
     graphics = Systemgraphic.objects.filter(aircraftsystem_id=system_id).filter(status__in=['Not Started','In Progress']).order_by('media_label', 'version')
+    for graphic in graphics:
+        graphic.booked = Graphicworkdone.objects.filter(systemgraphic_id=graphic.id).aggregate(booked=Sum('hours_expended'))
+        
+        if graphic.adjusted_hours is None:
+            graphic.adjusted_hours = 0
+        if graphic.booked["booked"] is None:
+            graphic.booked["booked"] = 0
+        graphic.delta = graphic.adjusted_hours - graphic.booked["booked"]
+        
     inprogress = Systemgraphic.objects.filter(aircraftsystem_id=system_id).filter(status__in=['In Progress']).order_by('media_label', 'version')
+    for graphic in inprogress:
+        graphic.booked = Graphicworkdone.objects.filter(systemgraphic_id=graphic.id).aggregate(booked=Sum('hours_expended'))
+
     inqa = Systemgraphic.objects.filter(aircraftsystem_id=system_id, status__in=['Development Completed','TechnicalReview','EditorialReview','InternalQA','UploadedToLCMS','ExternalReview']).order_by('media_label', 'version')
+    for graphic in inqa:
+        graphic.booked = Graphicworkdone.objects.filter(systemgraphic_id=graphic.id).aggregate(booked=Sum('hours_expended'))
+
     complete = Systemgraphic.objects.filter(aircraftsystem_id=system_id).filter(status__in=['Locked']).order_by('media_label', 'version')
+    for graphic in complete:
+        graphic.booked = Graphicworkdone.objects.filter(systemgraphic_id=graphic.id).aggregate(booked=Sum('hours_expended'))
+
     # Header Calculations
     adjest = Systemgraphic.objects.filter(aircraftsystem_id=system_id).aggregate(adjustedestimate=Sum('adjusted_hours'))
     est = Systemgraphic.objects.filter(aircraftsystem_id=system_id).aggregate(estimate=Sum('estimated_hours'))

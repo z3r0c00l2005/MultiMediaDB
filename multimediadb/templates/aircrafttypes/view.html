@@ -42,7 +42,7 @@
 		<td nowrap="nowrap">{{ system.description }}&nbsp;</td>
 		<td nowrap="nowrap">{{ system.workshare }}&nbsp;</td>
 		<td>
-		    <table cellpadding = "0" cellspacing = "0">
+		    <table style="border-spacing:0;border-style:hidden;padding:0px;border-collapse:collapse">
 		    <tr style="height:20px">
 		        {% if system.total != system.complete and system.total != 0 %}
 		        <td style="text-align:center;padding:0px;background-color:red;width:{{ system.notdonepc }}%">{% if system.notdone %}{{ system.notdone }}{% endif %}</td>
@@ -57,7 +57,15 @@
                 {% endif %}
 		   </tr>
 		   </table>
-            
+		   {% if system.adjest.adjustedestimate %}
+		   <table style="border-style:hidden;padding:0px;border-collapse:collapse">
+		   <tr>
+		        <td style="width:33%"><b>Adjusted Hours: </b>{{ system.adjest.adjustedestimate }}</td>
+		        <td style="width:33%"><b>Booked Hours: </b>{{ system.booked.booked }}</td>
+		        <td style="width:33%;{% if system.delta < 0 %} color:red; {% endif %}"><b>Remaining Hours: </b>{{ system.delta }}</td>
+		   </tr>
+		   </table>
+		   {% endif %}
 		</td>
 		<td class="actions">
 			<a href='{% url 'systemview' aircrafttype.id system.id %}'>View</a>
