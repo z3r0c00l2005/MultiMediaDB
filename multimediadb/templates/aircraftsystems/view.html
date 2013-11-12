@@ -8,6 +8,7 @@
 		<li><a href="{% url 'typeview' aircrafttype.id %}">All Aircraft Systems</a></li>
 		{% if perms.multimediadb.add_systemgraphic %}
         <li><a href="{% url 'graphicadd' aircrafttype.id system.id %}">New Graphic</a></li>
+        <li><a href="{% url 'graphicimport' aircrafttype.id system.id %}">Import Graphic CSV</a></li>
         {% endif %}
         {% if perms.multimediadb.add_upload %}
         <li><a href="{% url 'uploadadd' aircrafttype.id system.id 0 'system' %}">New Attachment</a></li>

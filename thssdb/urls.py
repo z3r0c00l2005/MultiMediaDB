@@ -34,6 +34,7 @@ urlpatterns = patterns('',
     url(r'^systems/comment/system/(?P<type_id>\d+)/(?P<system_id>\d+)/', views.commentadd, name='systemcommentadd'),
     
     url(r'^graphics/add/(?P<type_id>\d+)/(?P<system_id>\d+)/', views.graphicadd, name='graphicadd'),
+    url(r'^graphics/import/(?P<type_id>\d+)/(?P<system_id>\d+)/', views.graphicimport, name='graphicimport'),
     url(r'^graphics/edit/(?P<type_id>\d+)/(?P<system_id>\d+)/(?P<graphic_id>\d+)/', views.graphicedit, name='graphicedit'),
     url(r'^graphics/view/(?P<type_id>\d+)/(?P<system_id>\d+)/(?P<graphic_id>\d+)/', views.graphicview, name='graphicview'),
     url(r'^graphics/hold/(?P<type_id>\d+)/(?P<system_id>\d+)/(?P<graphic_id>\d+)/', views.graphicholdtoggle, name='graphichold'),

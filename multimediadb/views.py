@@ -553,7 +553,6 @@ def typeimport(request):
     view_url = reverse('typeindex')
     if 'cancel' in request.POST:
         return HttpResponseRedirect(reverse('typeindex'))
-    # Handle file upload
     if request.method == 'POST':
         form = ImportForm(request.POST, request.FILES)
         if form.is_valid():
@@ -582,7 +581,6 @@ def systemimport(request, type_id):
     view_url = reverse('typeview', args=(type_id,))
     if 'cancel' in request.POST:
         return HttpResponseRedirect(reverse('typeview', args=(type_id,)))
-    # Handle file upload
     if request.method == 'POST':
         form = ImportForm(request.POST, request.FILES)
         if form.is_valid():
@@ -604,6 +602,36 @@ def systemimport(request, type_id):
     else:
         form = ImportForm() # A empty, unbound form
     return render(request, 'csvimport/add.html', {'form': form})                  
+
+@login_required
+def graphicimport(request, type_id, system_id):
+    view_url = reverse('systemview', args=(type_id, system_id))
+    if 'cancel' in request.POST:
+        return HttpResponseRedirect('systemview', args=(type_id, system_id))
+    if request.method == 'POST':
+        form = ImportForm(request.POST, request.FILES)
+        if form.is_valid():
+            cd = form.cleaned_data
+            file = cd['filename']
+            
+            with file as f:
+                reader = csv.reader(f, delimiter=';', quoting=csv.QUOTE_NONE)
+                for row in reader:
+                    type = Aircrafttype.objects.get(id=type_id)
+                    system = Aircraftsystem.objects.get(id=system_id)
+                    
+                    if Systemgraphic.objects.filter(aircraftsystem=system.id, media_label=row[0]).count() > 0:
+                        graphic = Systemgraphic.objects.get(aircrafttype=type.id, media_label=row[0])
+                        Systemgraphic.objects.filter(id=graphic.id).update(aircraftsystem=system, media_label=row[0], title=row[1], description=row[2], estimated_hours=row[3], adjusted_hours=row[4], last_update_by='**Importer**', )
+                    else:
+                        query = Systemgraphic(aircraftsystem=system, media_label=row[0], title=row[1], description=row[2], estimated_hours=row[3], adjusted_hours=row[4], last_update_by='**Importer**', )
+                        query.save()
+            # Redirect to the document list after POST
+            return HttpResponseRedirect(reverse('systemview', args=(type_id, system_id)))
+    else:
+        form = ImportForm() # A empty, unbound form
+    return render(request, 'csvimport/add.html', {'form': form})              
+
      
 # ################
 # Report Views   #
