@@ -92,7 +92,6 @@ class PasswordChange(forms.Form):
             pass
         return self.cleaned_data
         
-        
 class UserEdit(forms.Form):
     username = forms.CharField()
     first_name = forms.CharField()
@@ -107,3 +106,6 @@ class UserEdit(forms.Form):
             self.fields['first_name'].initial = groupinfo['first_name']
             self.fields['last_name'].initial = groupinfo['last_name']
             self.fields['groups'].initial = int(groupinfo['groups'][0])
+            
+class ImportForm(forms.Form):
+    filename = forms.FileField(required=True)

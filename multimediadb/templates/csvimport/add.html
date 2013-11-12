@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block title %}Import CSV{% endblock %}
+{% block header %}Import CSV{% endblock %}
+{% block content %}
+<div class="actions">
+
+</div>
+
+<div class="aircraftgraphics form">
+	<h2>Import CSV</h2>
+	
+	{% if form.errors %}
+        <p style="color: red;">
+            Please correct the error{{ form.errors|pluralize }} below.
+        </p>
+    {% endif %}
+
+   <form action="" method="POST" enctype="multipart/form-data">
+
+        <div class="field">
+            {{ form.filename.errors }}
+            <label for="filename">File:</label>
+            {{ form.filename }}
+        </div>    
+        <div class="submit">
+        <input type="submit" name="submit" value="Import">
+        <input type="submit" name="cancel" value="Cancel">
+    </div>
+    </form>
+</div>
+
+{% endblock %}

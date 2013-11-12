@@ -8,6 +8,7 @@
 		<li><a href="{% url 'typeindex' %}">All Aircraft Types</a></li>
 		{% if perms.multimediadb.add_aircraftsystem %}
 		<li><a href="{% url 'systemadd' aircrafttype.id %}">New Aircraft System</a></li>
+		<li><a href='{% url 'systemimport' aircrafttype.id %}'>Import Aircraft System CSV</a></li>
 		{% endif %}
 		<li><a href="{% url 'logout' %}">Logout</a></li>
 	</ul>

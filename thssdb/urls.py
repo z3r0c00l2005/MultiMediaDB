@@ -23,10 +23,12 @@ urlpatterns = patterns('',
 	    
     url(r'^types/$', views.typeindex, name='typeindex'),
     url(r'^types/add$', views.typeadd, name='typeadd'),
+    url(r'^types/import$', views.typeimport, name='typeimport'),
     url(r'^types/edit/(?P<type_id>\d+)/', views.typeedit, name='typeedit'),
     url(r'^types/(?P<type_id>\d+)/', views.typeview, name='typeview'),
 	
 	url(r'^systems/add/(?P<type_id>\d+)/', views.systemadd, name='systemadd'),
+	url(r'^systems/import/(?P<type_id>\d+)/', views.systemimport, name='systemimport'),
 	url(r'^systems/(?P<type_id>\d+)/(?P<system_id>\d+)/', views.systemview, name='systemview'),
     url(r'^systems/edit/(?P<type_id>\d+)/(?P<system_id>\d+)/', views.systemedit, name='systemedit'),
     url(r'^systems/comment/system/(?P<type_id>\d+)/(?P<system_id>\d+)/', views.commentadd, name='systemcommentadd'),

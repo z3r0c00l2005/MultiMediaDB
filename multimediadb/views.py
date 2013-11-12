@@ -8,9 +8,9 @@ from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
 from filetransfers.api import prepare_upload, serve_file
 from django.contrib.auth.models import User
-import datetime
+import datetime, csv
 from multimediadb.models import Aircrafttype, Aircraftsystem, Systemgraphic, Graphicworkdone, Comments, Uploads, QA
-from multimediadb.forms import TypeAddForm, TypeEditForm, SystemAddForm, SystemEditForm, GraphicAddForm, GraphicEditForm, WorkAddForm, WorkEditForm, CommentAddForm, CommentEditForm, UploadForm, NewLoginForm, PasswordChange, UserEdit
+from multimediadb.forms import TypeAddForm, TypeEditForm, SystemAddForm, SystemEditForm, GraphicAddForm, GraphicEditForm, WorkAddForm, WorkEditForm, CommentAddForm, CommentEditForm, UploadForm, NewLoginForm, PasswordChange, UserEdit, ImportForm
 #from reportlab.pdfgen import canvas
 
 #from geraldo.generators import PDFGenerator
@@ -544,9 +544,67 @@ def edit_user(request, user_id):
         form = UserEdit(initial=dictionary)
     return render(request, 'registration/useredit.html', {'form': form})
  
- 
- 
- 
+# ################
+# CSV Views      #
+# ################     
+
+@login_required  
+def typeimport(request): 
+    view_url = reverse('typeindex')
+    if 'cancel' in request.POST:
+        return HttpResponseRedirect(reverse('typeindex'))
+    # Handle file upload
+    if request.method == 'POST':
+        form = ImportForm(request.POST, request.FILES)
+        if form.is_valid():
+            cd = form.cleaned_data
+            file = cd['filename']
+            
+            with file as f:
+                reader = csv.reader(f, delimiter=';', quoting=csv.QUOTE_NONE)
+                for row in reader:
+
+                    if Aircrafttype.objects.filter(name=row[0]).count() > 0:
+                        type = Aircrafttype.objects.get(name=row[0])
+                        Aircrafttype.objects.filter(id=type.id).update(name=row[0], description=row[1],)
+                    else:                
+                        query = Aircrafttype(name=row[0], description=row[1])
+                        query.save()
+            # Redirect to the document list after POST
+            return HttpResponseRedirect(reverse('typeindex'))
+    else:
+        form = ImportForm() # A empty, unbound form
+    return render(request, 'csvimport/add.html', {'form': form})
+
+
+@login_required
+def systemimport(request, type_id):
+    view_url = reverse('typeview', args=(type_id,))
+    if 'cancel' in request.POST:
+        return HttpResponseRedirect(reverse('typeview', args=(type_id,)))
+    # Handle file upload
+    if request.method == 'POST':
+        form = ImportForm(request.POST, request.FILES)
+        if form.is_valid():
+            cd = form.cleaned_data
+            file = cd['filename']
+            
+            with file as f:
+                reader = csv.reader(f, delimiter=';', quoting=csv.QUOTE_NONE)
+                for row in reader:
+                    type = Aircrafttype.objects.get(id=type_id)
+                    if Aircraftsystem.objects.filter(aircrafttype=type.id, name=row[0]).count() > 0:
+                        system = Aircraftsystem.objects.get(aircrafttype=type.id, name=row[0])
+                        Aircraftsystem.objects.filter(id=system.id).update(aircrafttype=type, name=row[0], description=row[1], workshare=row[2],)
+                    else:
+                        query = Aircraftsystem(aircrafttype=type, name=row[0], description=row[1], workshare=row[2],)
+                        query.save()
+            # Redirect to the document list after POST
+            return HttpResponseRedirect(reverse('typeview', args=(type_id,)))
+    else:
+        form = ImportForm() # A empty, unbound form
+    return render(request, 'csvimport/add.html', {'form': form})                  
+     
 # ################
 # Report Views   #
 # ################      

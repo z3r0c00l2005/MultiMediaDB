@@ -7,6 +7,7 @@
 	<ul>
 	{% if perms.multimediadb.add_aircrafttype %}
 		<li><a href='{% url 'typeadd' %}'>New Aircraft Type</a></li>
+		<li><a href='{% url 'typeimport' %}'>Import Aircraft Type CSV</a></li>
 	{% endif %}
 	{% if perms.auth.add_user %}
 		<li><a href="{% url 'allusers' %}">User Management</a></li>

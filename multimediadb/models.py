@@ -1,9 +1,12 @@
 from django.db import models
 
+
+# Base Django Project Models
+
 class Aircrafttype(models.Model):
     name = models.CharField(max_length=30)
     description = models.CharField(max_length=50)
-
+        
     def __unicode__(self):
         return u'%s - %s' % (self.name, self.description)
         
@@ -93,4 +96,7 @@ class QA(models.Model):
         
     def __unicode__(self):
         return u'%s - %s' % (self.systemgraphic, self.qa_stage)
-    
+
+
+
+
