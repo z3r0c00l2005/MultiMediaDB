@@ -51,6 +51,4 @@ urlpatterns = patterns('',
     url(r'^upload/(?P<type_id>\d+)/(?P<system_id>\d+)/(?P<graphic_id>\d+)/(?P<source>\w+)/', views.upload, name='uploadadd'),
     url(r'^download/(?P<pk>\d+)/', views.download_handler, name='download'),
     
-    #url('^typereport/$', views.typereport, name='typereport'),
-    #url(r'^systemreport/(?P<type_id>\d+)/', views.systemreport, name='systemreport'),
     ) + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

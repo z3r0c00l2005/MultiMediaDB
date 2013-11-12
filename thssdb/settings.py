@@ -132,7 +132,6 @@ INSTALLED_APPS = (
     # 'django.contrib.admindocs',
     'multimediadb',
     'filetransfers',
-    # 'geraldo',
 )
 
 # A sample logging configuration. The only tangible logging
