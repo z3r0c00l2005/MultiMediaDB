@@ -8,7 +8,7 @@ Install
 -------
 1. Microsoft .Net Framework 4
 2. Microsoft Visual C++ 2010 redist
-3. Install MySQL 5.6.11 (Also tested with 5.6.13)
+3. Install MySQL 5.6.11
 3.a. Configure as a "Server" machine
 3.b. Create a user with DBA privileges - Username: thssdb Password: thssdb
 4. Install Python 2.7.5 for all users
