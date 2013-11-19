@@ -587,11 +587,16 @@ def systemimport(request, type_id):
                 reader = csv.reader(f, delimiter=';', quoting=csv.QUOTE_NONE)
                 for row in reader:
                     type = Aircrafttype.objects.get(id=type_id)
-                    if Aircraftsystem.objects.filter(aircrafttype=type.id, name=row[0]).count() > 0:
-                        system = Aircraftsystem.objects.get(aircrafttype=type.id, name=row[0])
-                        Aircraftsystem.objects.filter(id=system.id).update(aircrafttype=type, name=row[0], description=row[1], workshare=row[2],)
+                    
+                    nme = row[0]
+                    desc = row[1]
+                    wrk = row [2]
+                    
+                    if Aircraftsystem.objects.filter(aircrafttype=type.id, name=nme).count() > 0:
+                        system = Aircraftsystem.objects.get(aircrafttype=type.id, name=nme)
+                        Aircraftsystem.objects.filter(id=system.id).update(aircrafttype=type, name=nme, description=desc, workshare=wrk,)
                     else:
-                        query = Aircraftsystem(aircrafttype=type, name=row[0], description=row[1], workshare=row[2],)
+                        query = Aircraftsystem(aircrafttype=type, name=nme, description=desc, workshare=wrk,)
                         query.save()
             # Redirect to the document list after POST
             return HttpResponseRedirect(reverse('typeview', args=(type_id,)))
@@ -603,7 +608,7 @@ def systemimport(request, type_id):
 def graphicimport(request, type_id, system_id):
     view_url = reverse('systemview', args=(type_id, system_id))
     if 'cancel' in request.POST:
-        return HttpResponseRedirect('systemview', args=(type_id, system_id))
+        return HttpResponseRedirect(reverse('systemview', args=(type_id, system_id)))
     if request.method == 'POST':
         form = ImportForm(request.POST, request.FILES)
         if form.is_valid():
