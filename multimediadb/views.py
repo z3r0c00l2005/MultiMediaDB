@@ -611,16 +611,34 @@ def graphicimport(request, type_id, system_id):
             file = cd['filename']
             
             with file as f:
-                reader = csv.reader(f, delimiter=';', quoting=csv.QUOTE_NONE)
+                reader = csv.reader(f, dialect='excel')
+                firstline = True
                 for row in reader:
+                    if firstline:
+                        firstline = False
+                        continue
                     type = Aircrafttype.objects.get(id=type_id)
                     system = Aircraftsystem.objects.get(id=system_id)
                     
-                    if Systemgraphic.objects.filter(aircraftsystem=system.id, media_label=row[0]).count() > 0:
-                        graphic = Systemgraphic.objects.get(aircrafttype=type.id, media_label=row[0])
-                        Systemgraphic.objects.filter(id=graphic.id).update(aircraftsystem=system, media_label=row[0], title=row[1], description=row[2], estimated_hours=row[3], adjusted_hours=row[4], last_update_by='**Importer**', )
+                    ml = row[0]
+                    tpt = row[1]
+                    kpt = row[2]
+                    desc = row[3]
+                    est = row[4]
+                    adj = row[5]
+                    
+                    titleo = tpt + ' - ' + kpt
+                    
+                    if not adj:
+                        adj = est
+                    
+                    if 'Maintenance Holding Graphic' in ml:
+                        continue
+                    if Systemgraphic.objects.filter(aircraftsystem=system.id, media_label=ml).count() > 0:
+                        graphic = Systemgraphic.objects.get(aircraftsystem=system.id, media_label=ml)
+                        Systemgraphic.objects.filter(id=graphic.id).update(aircraftsystem=system, media_label=ml, title=titleo, description=desc, estimated_hours=est, adjusted_hours=adj, last_update_by='**Importer**', )
                     else:
-                        query = Systemgraphic(aircraftsystem=system, media_label=row[0], title=row[1], description=row[2], estimated_hours=row[3], adjusted_hours=row[4], last_update_by='**Importer**', )
+                        query = Systemgraphic(aircraftsystem=system, media_label=ml, title=titleo, description=desc, estimated_hours=est, adjusted_hours=adj, last_update_by='**Importer**', )
                         query.save()
             # Redirect to the document list after POST
             return HttpResponseRedirect(reverse('systemview', args=(type_id, system_id)))
