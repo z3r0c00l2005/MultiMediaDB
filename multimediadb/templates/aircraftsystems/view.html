@@ -10,10 +10,10 @@
         <li><a href="{% url 'graphicadd' aircrafttype.id system.id %}">New Graphic</a></li>
         <li><a href="{% url 'graphicimport' aircrafttype.id system.id %}">Import Graphic CSV</a></li>
         {% endif %}
-        {% if perms.multimediadb.add_upload %}
+        {% if perms.multimediadb.add_uploads %}
         <li><a href="{% url 'uploadadd' aircrafttype.id system.id 0 'system' %}">New Attachment</a></li>
         {% endif %}
-        {% if perms.multimediadb.add_comment %}
+        {% if perms.multimediadb.add_comments %}
         <li><a href="{% url 'commentadd' aircrafttype.id system.id 0 0 'system' 'system' %}">New Comment</a></li>
         {% endif %}
 		<li><a href="{% url 'logout' %}">Logout</a></li>
@@ -180,7 +180,7 @@
 		<td>{{ comment.created_by }}&nbsp;</td>
 		<td>{{ comment.created }}&nbsp;</td>
        	<td class="actions">
-           	{% if perms.multimediadb.change_comment %}
+           	{% if perms.multimediadb.change_comments %}
 			<a href='#'>Edit</a>
 			{% endif %}
 		</td>
