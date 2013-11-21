@@ -14,7 +14,7 @@
         <li><a href="{% url 'uploadadd' aircrafttype.id system.id 0 'system' %}">New Attachment</a></li>
         {% endif %}
         {% if perms.multimediadb.add_comments %}
-        <li><a href="{% url 'commentadd' aircrafttype.id system.id 0 0 'system' 'system' %}">New Comment</a></li>
+        <li><a href="{% url 'commentadd' aircrafttype.id system.id 0 0 'system' 'User' %}">New Comment</a></li>
         {% endif %}
 		<li><a href="{% url 'logout' %}">Logout</a></li>
 	</ul>
@@ -169,13 +169,15 @@
     <h3>Comments</h3> 
  	<table cellpadding = "0" cellspacing = "0">
     <tr>
-			<th>Comment</th>
+			<th>Comment Source</th>
+            <th>Comment</th>
 			<th>Created By</th>
     		<th>Created On</th>
 			<th class="actions">Actions</th>
 	</tr>
     {% endif %}
 	<tr>
+        <td>{{ comment.comment_type }}&nbsp;</td>
 		<td>{{ comment.comment|linebreaksbr }}&nbsp;</td>
 		<td>{{ comment.created_by }}&nbsp;</td>
 		<td>{{ comment.created }}&nbsp;</td>

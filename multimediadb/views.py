@@ -303,7 +303,7 @@ def commentadd(request, type_id, system_id, graphic_id=0, graphic_version=0, sou
                 cd = form.cleaned_data
                 type = Aircrafttype.objects.get(id=type_id)
                 system = Aircraftsystem.objects.get(id=system_id)
-                query = Comments(source=source, source_id=system_id, comment=cd['comment'], created_by=request.user.get_full_name(), comment_type='system',)
+                query = Comments(source=source, source_id=system_id, comment=cd['comment'], created_by=request.user.get_full_name(), comment_type=commenttype, comment_version=0,)
                 query.save()
                 return HttpResponseRedirect(reverse('systemview', args=(type_id, system_id)))    
         else:
@@ -594,9 +594,21 @@ def systemimport(request, type_id):
                     
                     if Aircraftsystem.objects.filter(aircrafttype=type.id, name=nme).count() > 0:
                         system = Aircraftsystem.objects.get(aircrafttype=type.id, name=nme)
+                        
+                        if system.description != desc:
+                            query = Comments(source='system', source_id=system.id, comment='*** Description Changed ***\nFrom: "' + system.description + '"\nTo: "' + desc + '"', created_by=request.user.get_full_name(), comment_type='Importer', comment_version=0,)
+                            query.save()
+                        if system.workshare != wrk:
+                            query = Comments(source='system', source_id=system.id, comment='*** Workshare Changed ***\nFrom: "' + system.workshare + '"\nTo: "' + wrk + '"', created_by=request.user.get_full_name(), comment_type='Importer', comment_version=0,)
+                            query.save()
+                                                
+                        
                         Aircraftsystem.objects.filter(id=system.id).update(aircrafttype=type, name=nme, description=desc, workshare=wrk,)
                     else:
                         query = Aircraftsystem(aircrafttype=type, name=nme, description=desc, workshare=wrk,)
+                        query.save()
+                        system = Aircraftsystem.objects.get(aircrafttype=type.id, name=nme)
+                        query = Comments(source='system', source_id=system.id, comment='*** Initial Import ***', created_by=request.user.get_full_name(), comment_type='Importer', comment_version=0,)
                         query.save()
             # Redirect to the document list after POST
             return HttpResponseRedirect(reverse('typeview', args=(type_id,)))
@@ -640,11 +652,26 @@ def graphicimport(request, type_id, system_id):
                     if 'Maintenance Holding Graphic' in ml:
                         continue
                     if Systemgraphic.objects.filter(aircraftsystem=system.id, media_label=ml).count() > 0:
+                        # Update existing
                         graphic = Systemgraphic.objects.get(aircraftsystem=system.id, media_label=ml)
-                        Systemgraphic.objects.filter(id=graphic.id).update(aircraftsystem=system, media_label=ml, title=titleo, description=desc, estimated_hours=est, adjusted_hours=adj, last_update_by='**Importer**', )
+                        
+                        if graphic.title != titleo:
+                            query = Comments(source='graphic', source_id=graphic.id, comment='*** Title Changed ***\nFrom: "'+graphic.title+'"\nTo: "'+titleo+'"', created_by=request.user.get_full_name(), comment_type='Importer', comment_version=graphic.version,)
+                            query.save()
+                        if graphic.description != desc:
+                            query = Comments(source='graphic', source_id=graphic.id, comment='*** Description Changed ***\nFrom: "' + graphic.description + '"\nTo: "' + desc + '"', created_by=request.user.get_full_name(), comment_type='Importer', comment_version=graphic.version,)
+                            query.save()
+                            
+                        if graphic.title != titleo or graphic.description != desc:
+                            Systemgraphic.objects.filter(id=graphic.id).update(aircraftsystem=system, media_label=ml, title=titleo, description=desc, estimated_hours=est, adjusted_hours=adj, last_update_by=request.user.get_full_name() + '\n**Importer**', )
                     else:
-                        query = Systemgraphic(aircraftsystem=system, media_label=ml, title=titleo, description=desc, estimated_hours=est, adjusted_hours=adj, last_update_by='**Importer**', )
+                        # New Record to Import
+                        query = Systemgraphic(aircraftsystem=system, media_label=ml, title=titleo, description=desc, estimated_hours=est, adjusted_hours=adj, last_update_by=request.user.get_full_name() + '\n**Importer**', )
                         query.save()
+                        graphic = Systemgraphic.objects.get(aircraftsystem=system.id, media_label=ml)
+                        query = Comments(source='graphic', source_id=graphic.id, comment='*** Initial Import ***', created_by=request.user.get_full_name(), comment_type='Importer', comment_version=graphic.version,)
+                        query.save()
+                        
             # Redirect to the document list after POST
             return HttpResponseRedirect(reverse('systemview', args=(type_id, system_id)))
     else:
