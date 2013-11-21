@@ -183,7 +183,7 @@
 		<td>{{ comment.created }}&nbsp;</td>
        	<td class="actions">
            	{% if perms.multimediadb.change_comments %}
-			<a href='#'>Edit</a>
+			{% comment %} <a href='#'>Edit</a> {% endcomment %}
 			{% endif %}
 		</td>
 	</tr>
