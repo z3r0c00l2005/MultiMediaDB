@@ -9,8 +9,8 @@ from django.contrib.auth.decorators import login_required
 from filetransfers.api import prepare_upload, serve_file
 from django.contrib.auth.models import User
 import datetime, csv
-from multimediadb.models import Aircrafttype, Aircraftsystem, Systemgraphic, Graphicworkdone, Comments, Uploads, QA
-from multimediadb.forms import TypeAddForm, TypeEditForm, SystemAddForm, SystemEditForm, GraphicAddForm, GraphicEditForm, WorkAddForm, WorkEditForm, CommentAddForm, CommentEditForm, UploadForm, NewLoginForm, PasswordChange, UserEdit, ImportForm
+from multimediadb.models import Aircrafttype, Aircraftsystem, Systemgraphic, Graphicworkdone, Comments, Uploads, QA, Aircraft3Dsystem, Status3D
+from multimediadb.forms import TypeAddForm, TypeEditForm, SystemAddForm, SystemEditForm, GraphicAddForm, GraphicEditForm, WorkAddForm, WorkEditForm, CommentAddForm, CommentEditForm, UploadForm, NewLoginForm, PasswordChange, UserEdit, ImportForm, System3DAddForm, System3DEditForm
 
 # ################
 # Type Views     #
@@ -86,6 +86,29 @@ def typeedit(request, type_id):
         form = TypeEditForm(initial=dictionary)
     return render(request, 'aircrafttypes/edit.html', {'form': form})
 
+@login_required    
+def typeview3d(request, type_id):
+    type = Aircrafttype.objects.get(pk=type_id)
+    systems = Aircraft3Dsystem.objects.filter(aircrafttype_id=type_id).order_by('name')
+
+    for system in systems:
+        #system.total = Systemgraphic.objects.filter(aircraftsystem_id=system.id).count()
+        #system.notdone = Systemgraphic.objects.filter(aircraftsystem_id=system.id).filter(status__in=['Not Started']).filter(on_hold=0).count()
+        #system.work = Systemgraphic.objects.filter(aircraftsystem_id=system.id).filter(status__in=['In Progress']).filter(on_hold=0).count()
+        #system.hold = Systemgraphic.objects.filter(aircraftsystem_id=system.id).filter(status__in=['Not Started','In Progress']).filter(on_hold=1).count()
+        #system.qa = Systemgraphic.objects.filter(aircraftsystem_id=system.id, status__in=['Development Completed','TechnicalReview','EditorialReview','InternalQA','UploadedToLCMS','ExternalReview']).count()
+        #system.complete = Systemgraphic.objects.filter(aircraftsystem_id=system.id).filter(status__in=['Locked']).count()
+
+        #if system.total!=0:
+        #    onepc = 100.0/system.total
+        #    system.notdonepc = system.notdone*onepc
+        #    system.workpc = system.work*onepc
+        #    system.holdpc = system.hold * onepc
+        #    system.qapc = system.qa * onepc
+        #    system.completepc = system.complete * onepc
+        a = 1
+    # assert false, locals()
+    return render(request, 'aircrafttypes/view3d.html', {'aircrafttype': type, 'systems': systems})
 
 # ################
 # System Views   #
@@ -302,10 +325,25 @@ def commentadd(request, type_id, system_id, graphic_id=0, graphic_version=0, sou
             if form.is_valid():
                 cd = form.cleaned_data
                 type = Aircrafttype.objects.get(id=type_id)
-                system = Aircraftsystem.objects.get(id=system_id)
+                system = Aircraft3Dsystem.objects.get(id=system_id)
                 query = Comments(source=source, source_id=system_id, comment=cd['comment'], created_by=request.user.get_full_name(), comment_type=commenttype, comment_version=0,)
                 query.save()
                 return HttpResponseRedirect(reverse('systemview', args=(type_id, system_id)))    
+        else:
+            form = CommentAddForm()
+        return render(request, 'comments/add.html', {'form': form})
+    elif source == '3Dsystem':
+        if 'cancel' in request.POST:
+                return HttpResponseRedirect(reverse('systemview3d', args=(type_id, system_id))) 
+        if request.method == 'POST':
+            form = CommentAddForm(request.POST)
+            if form.is_valid():
+                cd = form.cleaned_data
+                type = Aircrafttype.objects.get(id=type_id)
+                system = Aircraftsystem.objects.get(id=system_id)
+                query = Comments(source=source, source_id=system_id, comment=cd['comment'], created_by=request.user.get_full_name(), comment_type=commenttype, comment_version=0,)
+                query.save()
+                return HttpResponseRedirect(reverse('systemview3d', args=(type_id, system_id)))    
         else:
             form = CommentAddForm()
         return render(request, 'comments/add.html', {'form': form})
@@ -363,6 +401,24 @@ def upload(request, type_id, system_id, graphic_id=0, source='a'):
                 newdoc.save()
                 # Redirect to the document list after POST
                 return HttpResponseRedirect(reverse('systemview', args=(type_id, system_id)))
+        else:
+            form = UploadForm() # A empty, unbound form
+        return render(request, 'uploads/add.html', {'form': form})
+    if source == '3Dsystem':
+        view_url = reverse('systemview3d', args=(type_id, system_id))
+        if 'cancel' in request.POST:
+            return HttpResponseRedirect(reverse('systemview3d', args=(type_id, system_id)))
+        # Handle file upload
+        if request.method == 'POST':
+            form = UploadForm(request.POST, request.FILES)
+            if form.is_valid():
+                cd = form.cleaned_data
+                type = Aircrafttype.objects.get(id=type_id)
+                system = Aircraft3Dsystem.objects.get(id=system_id)
+                newdoc = Uploads(file = request.FILES['filename'], description=cd['description'], source=source, source_id=system_id )
+                newdoc.save()
+                # Redirect to the document list after POST
+                return HttpResponseRedirect(reverse('systemview3d', args=(type_id, system_id)))
         else:
             form = UploadForm() # A empty, unbound form
         return render(request, 'uploads/add.html', {'form': form})
@@ -678,4 +734,174 @@ def graphicimport(request, type_id, system_id):
         form = ImportForm() # A empty, unbound form
     return render(request, 'csvimport/add.html', {'form': form})              
 
-     
+@login_required
+def systemimport3d(request, type_id):
+    view_url = reverse('type3dview', args=(type_id,))
+    if 'cancel' in request.POST:
+        return HttpResponseRedirect(reverse('type3dview', args=(type_id,)))
+    if request.method == 'POST':
+        form = ImportForm(request.POST, request.FILES)
+        if form.is_valid():
+            cd = form.cleaned_data
+            file = cd['filename']
+            
+            with file as f:
+                reader = csv.reader(f, delimiter=';', quoting=csv.QUOTE_NONE)
+                for row in reader:
+                    type = Aircrafttype.objects.get(id=type_id)
+                    
+                    nme = row[0]
+                    desc = row[1]
+                    
+                    if Aircraft3Dsystem.objects.filter(aircrafttype=type.id, name=nme).count() > 0:
+                        system = Aircraft3Dsystem.objects.get(aircrafttype=type.id, name=nme)
+                        
+                        if system.description != desc:
+                            query = Comments(source='3Dsystem', source_id=system.id, comment='*** Description Changed ***\nFrom: "' + system.description + '"\nTo: "' + desc + '"', created_by=request.user.get_full_name(), comment_type='Importer', comment_version=0,)
+                            query.save()
+                        
+                        Aircraft3Dsystem.objects.filter(id=system.id).update(aircrafttype=type, name=nme, description=desc, )
+                    else:
+                        query = Aircraft3Dsystem(aircrafttype=type, name=nme, description=desc, )
+                        query.save()
+                        system = Aircraft3Dsystem.objects.get(aircrafttype=type.id, name=nme)
+                        query = Comments(source='3Dsystem', source_id=system.id, comment='*** Initial Import ***', created_by=request.user.get_full_name(), comment_type='Importer', comment_version=0,)
+                        query.save()
+            # Redirect to the document list after POST
+            return HttpResponseRedirect(reverse('type3dview', args=(type_id,)))
+    else:
+        form = ImportForm() # A empty, unbound form
+    return render(request, 'csvimport/add.html', {'form': form})                  
+
+# ################
+# System Views   #
+# ################
+	
+@login_required
+def systemadd3d(request, type_id):
+    if 'cancel' in request.POST:
+            return HttpResponseRedirect(reverse('type3dview', args=(type_id,)))    
+    if request.method == 'POST':
+        form = System3DAddForm(request.POST)
+        if form.is_valid():
+            cd = form.cleaned_data
+            type = Aircrafttype.objects.get(id=type_id)
+            query = Aircraft3Dsystem(aircrafttype=type, name=cd['name'], description=cd['description'],)
+            query.save()
+            return HttpResponseRedirect(reverse('type3dview', args=(type_id,)))
+    else:
+        form = System3DAddForm()
+    return render(request, '3dsystems/add.html', {'form': form})
+
+@login_required
+def systemedit3d(request, type_id, system_id):
+    if 'cancel' in request.POST:
+            return HttpResponseRedirect(reverse('type3dview', args=(type_id,)))   
+    if request.method == 'POST':
+        form = System3DEditForm(request.POST)
+        if form.is_valid():
+            cd = form.cleaned_data
+            type = Aircrafttype.objects.get(id=type_id)
+            Aircraft3Dsystem.objects.filter(id=system_id).update(aircrafttype=type, name=cd['name'], description=cd['description'],)
+            return HttpResponseRedirect(reverse('type3dview', args=(type_id,)))
+    else:
+        system = Aircraft3Dsystem.objects.get(id=system_id)
+        dictionary = model_to_dict(system, fields=[], exclude=[])
+        form = System3DEditForm(initial=dictionary)
+    return render(request, '3dsystems/edit.html', {'form': form})
+
+@login_required
+def systemview3d(request, type_id, system_id):
+    type = Aircrafttype.objects.get(pk=type_id)
+    system = Aircraft3Dsystem.objects.get(pk=system_id)
+    
+    currstatus = Status3D.objects.filter(aircraft3dsystem=system.id, ).order_by('id').reverse()[:1]
+
+    if currstatus.count() == 0:
+        row = Status3D(aircraft3dsystem=system, version=0,stage='CATIA_Extracted' )
+        row.save()
+        currstatus2 = currstatus.get()
+    else:
+        currstatus2 = currstatus.get()
+    
+    if currstatus2.stage == 'CATIA_Extracted' and currstatus2.result == 'Pass':
+        Aircraft3Dsystem.objects.filter(pk=system_id).update(status=currstatus2.stage)
+        row = Status3D(aircraft3dsystem=system, version=0, stage='3DPDF_Created' )
+        row.save()
+        currstatus2 = currstatus.get()
+        system = Aircraft3Dsystem.objects.get(pk=system_id)
+        
+    if currstatus2.stage == '3DPDF_Created' and currstatus2.result == 'Pass':
+        Aircraft3Dsystem.objects.filter(pk=system_id).update(status=currstatus2.stage)
+        row = Status3D(aircraft3dsystem=system, version=0, stage='Checked_Against_Storyboard' )
+        row.save()
+        currstatus2 = currstatus.get()
+        system = Aircraft3Dsystem.objects.get(pk=system_id)
+        
+    if currstatus2.stage == 'Checked_Against_Storyboard' and currstatus2.result == 'Pass':
+        Aircraft3Dsystem.objects.filter(pk=system_id).update(status=currstatus2.stage)
+        row = Status3D(aircraft3dsystem=system, version=0, stage='Converted_to_3DMax' )
+        row.save()
+        currstatus2 = currstatus.get()
+        system = Aircraft3Dsystem.objects.get(pk=system_id)
+
+    if currstatus2.stage == 'Converted_to_3DMax' and currstatus2.result == 'Pass':
+        Aircraft3Dsystem.objects.filter(pk=system_id).update(status=currstatus2.stage)
+        row = Status3D(aircraft3dsystem=system, version=0, stage='Rigged_For_Animation' )
+        row.save()
+        currstatus2 = currstatus.get()
+        system = Aircraft3Dsystem.objects.get(pk=system_id)
+
+    if currstatus2.stage == 'Rigged_For_Animation' and currstatus2.result == 'Pass':
+        Aircraft3Dsystem.objects.filter(pk=system_id).update(status=currstatus2.stage)
+        row = Status3D(aircraft3dsystem=system, version=0, stage='SME_Signed_Off' )
+        row.save()
+        currstatus2 = currstatus.get()
+        system = Aircraft3Dsystem.objects.get(pk=system_id)
+
+    if currstatus2.stage == 'SME_Signed_Off' and currstatus2.result == 'Pass':
+        Aircraft3Dsystem.objects.filter(pk=system_id).update(status=currstatus2.stage)
+        row = Status3D(aircraft3dsystem=system, version=0, stage='CATIA_Update_Required' )
+        row.save()
+        currstatus2 = currstatus.get()
+        system = Aircraft3Dsystem.objects.get(pk=system_id)
+        
+    if currstatus2.stage == 'CATIA_Update_Required' and currstatus2.result == 'Pass':
+        row = Status3D(aircraft3dsystem=system, version=0, stage='Complete' )
+        row.save()
+        currstatus2 = currstatus.get()
+        Aircraft3Dsystem.objects.filter(pk=system_id).update(status=currstatus2.stage)
+        system = Aircraft3Dsystem.objects.get(pk=system_id)
+        
+    if currstatus2.result == 'Fail':
+        Aircraft3Dsystem.objects.filter(pk=system_id).update(status='Not Started')
+        row = Status3D(aircraft3dsystem=system, version=0,stage='CATIA_Extracted' )
+        row.save()
+        currstatus2 = currstatus.get()
+        system = Aircraft3Dsystem.objects.get(pk=system_id)
+        
+    statuss = Status3D.objects.filter(aircraft3dsystem=system.id, ).order_by('id')
+    
+    # Tables of comments
+    comments = Comments.objects.filter(source='3Dsystem', source_id=system_id,)
+    uploads = Uploads.objects.filter(source='3Dsystem', source_id=system_id,)
+    
+    return render(request, '3dsystems/view.html', {'aircrafttype': type, 'system': system, 'comments': comments, 'uploads': uploads, 'statuss': statuss})
+        
+@login_required
+def result3d(request, type_id, system_id, version, stage, stage_id, result):
+    type = Aircrafttype.objects.get(pk=type_id)
+    system = Aircraft3Dsystem.objects.get(pk=system_id)
+    
+    if result == 'Pass':
+        
+        Status3D.objects.filter(pk=stage_id).update(result=result, created_by=request.user.get_full_name())
+    else:
+        Status3D.objects.filter(pk=stage_id).update(result=result, created_by=request.user.get_full_name())
+        #Systemgraphic.objects.filter(id=system_id).update(status='In Progress',)
+        #query = Comments(source='3Dsystem', source_id=graphic_id, comment='*** QA FAIL ***', created_by=request.user.get_full_name(), comment_type='Notification', comment_version=graphic.version,)
+        #query.save()
+        #return redirect('systemview', type_id=type.id, system_id=system.id)
+    
+    return redirect('systemview3d', type_id=type.id, system_id=system.id)
+    

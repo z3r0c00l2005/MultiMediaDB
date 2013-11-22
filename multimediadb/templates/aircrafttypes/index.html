@@ -34,7 +34,8 @@
 		<td>{{ aircrafttype.name }}&nbsp;</td>
 		<td>{{ aircrafttype.description }}&nbsp;</td>
 		<td class="actions">
-			<a href="{% url 'typeview' aircrafttype.id %}">View</a>
+			<a href="{% url 'typeview' aircrafttype.id %}">MRFs</a>
+            <a href="{% url 'type3dview' aircrafttype.id %}">3D Status</a>
 			{% if perms.multimediadb.change_aircrafttype %}
 			<a href="{% url 'typeedit' aircrafttype.id %}">Edit</a>
 			{% endif %}

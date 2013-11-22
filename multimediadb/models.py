@@ -97,6 +97,24 @@ class QA(models.Model):
     def __unicode__(self):
         return u'%s - %s' % (self.systemgraphic, self.qa_stage)
 
+class Aircraft3Dsystem(models.Model):
+    aircrafttype = models.ForeignKey(Aircrafttype)
+    name = models.CharField(max_length=30)
+    description = models.CharField(max_length=50)
+    status = models.CharField(max_length=100, default='Not Started')
+        
+    def __unicode__(self):
+        return u'%s - %s' % (self.name, self.description)
 
-
-
+class Status3D(models.Model):
+    aircraft3dsystem = models.ForeignKey(Aircraft3Dsystem)
+    stage = models.CharField(max_length=255)
+    version = models.PositiveIntegerField()
+    result = models.CharField(max_length=5)
+    created_by = models.CharField(max_length=50)
+    modified_by = models.CharField(max_length=50)
+    created = models.DateTimeField(auto_now_add=True, auto_now=False)
+    modified = models.DateTimeField(auto_now=True, auto_now_add=False)
+        
+    def __unicode__(self):
+        return u'%s - %s' % (self.aircraft3dsystem, self.stage)

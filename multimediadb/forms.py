@@ -109,3 +109,12 @@ class UserEdit(forms.Form):
             
 class ImportForm(forms.Form):
     filename = forms.FileField(required=True)
+
+class System3DAddForm(forms.Form):
+    name = forms.CharField(max_length=30)
+    description = forms.CharField(max_length=50)
+        
+class System3DEditForm(forms.Form):
+    name = forms.CharField(max_length=30)
+    description = forms.CharField(max_length=50)
+    

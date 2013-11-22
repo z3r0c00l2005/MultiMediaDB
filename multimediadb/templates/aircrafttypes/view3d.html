@@ -7,15 +7,15 @@
 	<ul>
 		<li><a href="{% url 'typeindex' %}">All Aircraft Types</a></li>
 		{% if perms.multimediadb.add_aircraftsystem %}
-		<li><a href="{% url 'systemadd' aircrafttype.id %}">New Aircraft System</a></li>
-		<li><a href='{% url 'systemimport' aircrafttype.id %}'>Import Aircraft System CSV</a></li>
+		<li><a href="{% url 'systemadd3d' aircrafttype.id %}">New 3D Aircraft System</a></li>
+		<li><a href='{% url 'systemimport3d' aircrafttype.id %}'>Import 3D Aircraft System CSV</a></li>
 		{% endif %}
 		<li><a href="{% url 'logout' %}">Logout</a></li>
 	</ul>
 </div>
 
 <div class="aircrafttypes view">
-	<h2>Media Request Form Information</h2>
+	<h2>3D Development Status</h2>
        <dl>
            <dt>Name</dt>
            <dd>{{ aircrafttype.name }}&nbsp;</dd>
@@ -33,7 +33,6 @@
     <tr>
 			<th>Name</th>
 			<th>Description</th>
-    		<th>Workshare</th>
     		<th>Status</th>
 			<th class="actions">Actions</th>
 	</tr>
@@ -41,8 +40,9 @@
 	<tr>
 		<td nowrap="nowrap">{{ system.name }}&nbsp;</td>
 		<td nowrap="nowrap">{{ system.description }}&nbsp;</td>
-		<td nowrap="nowrap">{{ system.workshare }}&nbsp;</td>
-		<td>
+        <td nowrap="nowrap">{{ system.status }}&nbsp;</td>
+		{% comment %}<td>
+        
 		    <table style="border-spacing:0;border-style:hidden;padding:0px;border-collapse:collapse">
 		    <tr style="height:20px">
 		        {% if system.total != system.complete and system.total != 0 %}
@@ -58,20 +58,12 @@
                 {% endif %}
 		   </tr>
 		   </table>
-		   {% if system.adjest.adjustedestimate %}
-		   <table style="border-style:hidden;padding:0px;border-collapse:collapse">
-		   <tr>
-		        <td style="width:33%"><b>Adjusted Hours: </b>{{ system.adjest.adjustedestimate }}</td>
-		        <td style="width:33%"><b>Booked Hours: </b>{{ system.booked.booked }}</td>
-		        <td style="width:33%;{% if system.delta < 0 %} color:red; {% endif %}"><b>Remaining Hours: </b>{{ system.delta }}</td>
-		   </tr>
-		   </table>
-		   {% endif %}
-		</td>
+           
+		</td>{% endcomment %}
 		<td class="actions">
-			<a href='{% url 'systemview' aircrafttype.id system.id %}'>View</a>
+			<a href='{% url 'systemview3d' aircrafttype.id system.id %}'>View</a>
 			{% if perms.multimediadb.change_aircraftsystem %}
-			<a href='{% url 'systemedit' aircrafttype.id system.id %}'>Edit</a>
+			<a href='{% url 'systemedit3d' aircrafttype.id system.id %}'>Edit</a>
 			{% endif %}
 		</td>
 	</tr>

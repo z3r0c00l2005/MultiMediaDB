@@ -26,7 +26,15 @@ urlpatterns = patterns('',
     url(r'^types/import$', views.typeimport, name='typeimport'),
     url(r'^types/edit/(?P<type_id>\d+)/', views.typeedit, name='typeedit'),
     url(r'^types/(?P<type_id>\d+)/', views.typeview, name='typeview'),
-	
+    url(r'^3dtypes/(?P<type_id>\d+)/', views.typeview3d, name='type3dview'),
+
+	url(r'^3dsystems/add/(?P<type_id>\d+)/', views.systemadd3d, name='systemadd3d'),
+	url(r'^3dsystems/import/(?P<type_id>\d+)/', views.systemimport3d, name='systemimport3d'),
+	url(r'^3dsystems/(?P<type_id>\d+)/(?P<system_id>\d+)/', views.systemview3d, name='systemview3d'),
+    url(r'^3dsystems/edit/(?P<type_id>\d+)/(?P<system_id>\d+)/', views.systemedit3d, name='systemedit3d'),
+    url(r'^3dsystems/comment/system/(?P<type_id>\d+)/(?P<system_id>\d+)/', views.commentadd, name='systemcommentadd3d'),
+    url(r'^3dsystems/result3d/(?P<type_id>\d+)/(?P<system_id>\d+)/(?P<version>\d+)/(?P<stage>\w+)/(?P<stage_id>\d+)/(?P<result>\w+)/', views.result3d, name='result3d'),
+	    
 	url(r'^systems/add/(?P<type_id>\d+)/', views.systemadd, name='systemadd'),
 	url(r'^systems/import/(?P<type_id>\d+)/', views.systemimport, name='systemimport'),
 	url(r'^systems/(?P<type_id>\d+)/(?P<system_id>\d+)/', views.systemview, name='systemview'),
