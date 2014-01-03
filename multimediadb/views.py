@@ -826,12 +826,12 @@ def systemview3d(request, type_id, system_id):
     
     if currstatus2.stage == 'CATIA_Extracted' and currstatus2.result == 'Pass':
         Aircraft3Dsystem.objects.filter(pk=system_id).update(status=currstatus2.stage)
-        row = Status3D(aircraft3dsystem=system, version=0, stage='3DPDF_Created' )
+        row = Status3D(aircraft3dsystem=system, version=0, stage='3D_PDF_Created' )
         row.save()
         currstatus2 = currstatus.get()
         system = Aircraft3Dsystem.objects.get(pk=system_id)
         
-    if currstatus2.stage == '3DPDF_Created' and currstatus2.result == 'Pass':
+    if currstatus2.stage == '3D_PDF_Created' and currstatus2.result == 'Pass':
         Aircraft3Dsystem.objects.filter(pk=system_id).update(status=currstatus2.stage)
         row = Status3D(aircraft3dsystem=system, version=0, stage='Checked_Against_Storyboard' )
         row.save()
@@ -840,12 +840,12 @@ def systemview3d(request, type_id, system_id):
         
     if currstatus2.stage == 'Checked_Against_Storyboard' and currstatus2.result == 'Pass':
         Aircraft3Dsystem.objects.filter(pk=system_id).update(status=currstatus2.stage)
-        row = Status3D(aircraft3dsystem=system, version=0, stage='Converted_to_3DMax' )
+        row = Status3D(aircraft3dsystem=system, version=0, stage='Converted_to_Max' )
         row.save()
         currstatus2 = currstatus.get()
         system = Aircraft3Dsystem.objects.get(pk=system_id)
 
-    if currstatus2.stage == 'Converted_to_3DMax' and currstatus2.result == 'Pass':
+    if currstatus2.stage == 'Converted_to_Max' and currstatus2.result == 'Pass':
         Aircraft3Dsystem.objects.filter(pk=system_id).update(status=currstatus2.stage)
         row = Status3D(aircraft3dsystem=system, version=0, stage='Rigged_For_Animation' )
         row.save()
