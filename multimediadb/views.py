@@ -23,8 +23,10 @@ def typeindex(request):
 @login_required    
 def typeview(request, type_id):
     type = Aircrafttype.objects.get(pk=type_id)
-    systems = Aircraftsystem.objects.filter(aircrafttype_id=type_id).order_by('-workshare', 'name')
 
+    is_manager = request.user.groups.filter(name='Managers').count() | request.user.is_superuser
+    systems = Aircraftsystem.objects.filter(aircrafttype_id=type_id).order_by('-workshare', 'name')
+    
     for system in systems:
         system.total = Systemgraphic.objects.filter(aircraftsystem_id=system.id).count()
         system.notdone = Systemgraphic.objects.filter(aircraftsystem_id=system.id).filter(status__in=['Not Started']).filter(on_hold=0).count()
@@ -53,7 +55,7 @@ def typeview(request, type_id):
             system.completepc = system.complete * onepc
   
     # assert false, locals()
-    return render(request, 'aircrafttypes/view.html', {'aircrafttype': type, 'systems': systems})
+    return render(request, 'aircrafttypes/view.html', {'aircrafttype': type, 'systems': systems, 'is_manager': is_manager})
 
 @login_required
 def typeadd(request):
